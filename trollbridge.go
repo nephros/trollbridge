@@ -108,7 +108,7 @@ func loadSettings() error {
 	fmt.Printf("Trying to load settings from %s\n", filename)
 	f, err := os.Open(filename)
 	if err != nil {
-		config = Config{LastRun: time.Now(), DownloadPath: "/home/nemo/Pictures/Olympus"}
+		config = Config{LastRun: time.Now(), DownloadPath: fmt.Sprintf("%s/Pictures/Olympus", path)}
 		return nil
 	}
 	defer f.Close()
