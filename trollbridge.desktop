@@ -6,3 +6,8 @@ X-Nemo-Application-Type=generic
 Name=Troll Bridge
 Icon=harbour-trollbridge
 Exec=harbour-trollbridge
+
+[X-Sailjail]
+ApplicationName=TrollBridge
+OrganizationName=org.bundyo
+Permissions=Pictures;Internet;RemovableMedia;Downloads
