@@ -7,5 +7,11 @@ ApplicationWindow {
 	initialPage: Component { TrollBridge { id: tbMain } }
 	allowedOrientations: Orientation.All
 	_defaultPageOrientations: Orientation.All
+
+	Component.onCompleted: {
+		Qt.application.name		= 'TrollBridge';
+		Qt.application.organization	= 'org.bundyo';
+		Qt.application.domain		= 'www.bundyo.org';
+	}
 }
 
