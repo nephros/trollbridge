@@ -84,7 +84,7 @@ export GOPATH GOROOT
 #~/gohome/go/bin/go list -m all
 #~/gohome/go/bin/go get gopkg.in/qml.v1
 #~/gohome/go/bin/go get launchpad.net/xmlpath
-~/gohome/go/bin/go build -ldflags "-s" -o %{name}
+~/gohome/go/bin/go build -pkgdir $GOROOT/pkg/ -ldflags "-s" -o %{name}
 # << build pre
 
 # >> build post
