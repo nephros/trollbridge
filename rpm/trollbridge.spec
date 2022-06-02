@@ -10,6 +10,10 @@ Release:    1
 Group:      Applications/Multimedia
 License:    MIT
 Source: https://github.com/bundyo/trollbridge/archive/v%{version}.tar.gz
+Source1: go1.17.4.linux-armv6l.tar.gz
+Source2: go1.17.4.linux-arm64.tar.gz
+Source3: go1.17.4.linux-amd64.tar.gz
+
 #Requires:   mapplauncherd-booster-silica-qt5
 #Requires:   nemo-qml-plugin-thumbnailer-qt5
 Requires:   sailfishsilica-qt5
@@ -26,36 +30,47 @@ TRaveller's OLympus Bridge is an app for controlling Olympus OM-D/PEN/Air camera
 %prep
 # >> setup
 #%setup -q -n example-app-%{version}
+%setup -n %{name}-%{version}
 rm -rf vendor
-# prepare go compiler
-tar -zxvf go1.17.4.linux-amd64.tar.gz
-export GOROOT=$PWD/go
-mkdir -p ~/gitwork/go/src
-mkdir ~/gitwork/go/bin
-mkdir ~/gitwork/go/pkg
-export GOPATH=~/gitwork/go
-go version
-# cross-compile:
-mkdir gobuild
-tar -C gobuild -zxvf go1.17.4..tar.gz
-cd gobuild/
-cd go
-cd src
-export GOARCH=arm64
-export GOROOT_BOOTSTRAP=$GOROOT
-export GOOS=linux
-./make.bootstrap
-rm -rf $GOROOT
-tar -C ~/go/ -xJvf ../../go-linux-arm64-bootstrap.tbz
 # << setup
 
 %build
 # >> build pre
 GOPATH=%(pwd):~/
-GOROOT=~/go
+
+echo GOPATH: $GOPATH
+ls $GOPATH
+
+## unpack the compiler tarball:
+mkdir -p $HOME/gohome
+pushd $HOME/gohome
+
+echo "Unpacking go compiler package for %_arch"
+%ifarch armv7hl
+echo we are arm
+gunzip -dc %{SOURCE1} | tar -xof -
+export GOARCH=arm
+%endif
+
+%ifarch aarch64
+echo we are arm64
+gunzip -dc %{SOURCE2} | tar -xof -
+export GOARCH=arm64
+%endif
+
+%ifarch %ix86
+echo we are x86
+gunzip -dc %{SOURCE3} | tar -xof -
+export GOARCH=386
+%endif
+popd
+
+$HOME/gohome/go/bin/go version
+
+GOROOT=~/gohome/go
 export GOPATH GOROOT
 cd %(pwd)
-~/go/bin/go build -ldflags "-s" -o %{name}
+~/gohome/go/bin/go build -ldflags "-s" -o %{name}
 # << build pre
 
 # >> build post
