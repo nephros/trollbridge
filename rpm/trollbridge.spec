@@ -15,6 +15,8 @@ Source: %{name}-%{version}.tar.gz
 Source1: go1.17.4.linux-armv6l.tar.gz
 Source2: go1.17.4.linux-arm64.tar.gz
 Source3: go1.17.4.linux-amd64.tar.gz
+Source4: go_qml.v1.tar.gz
+Source5: launchpad.net_xmlpath.tar.gz
 
 #Requires:   mapplauncherd-booster-silica-qt5
 #Requires:   nemo-qml-plugin-thumbnailer-qt5
@@ -64,6 +66,13 @@ echo we are x86
 gunzip -dc %{SOURCE3} | tar -xof -
 export GOARCH=386
 %endif
+
+# install deps
+pushd go
+gunzip -dc %{SOURCE4} | tar -xof -
+gunzip -dc %{SOURCE5} | tar -xof -
+popd
+
 popd
 
 $HOME/gohome/go/bin/go version
@@ -72,6 +81,9 @@ GOROOT=~/gohome/go
 export GOPATH GOROOT
 #~/gohome/go/bin/go mod init
 ~/gohome/go/bin/go env -w GO111MODULE=off
+#~/gohome/go/bin/go list -m all
+#~/gohome/go/bin/go get gopkg.in/qml.v1
+#~/gohome/go/bin/go get launchpad.net/xmlpath
 ~/gohome/go/bin/go build -ldflags "-s" -o %{name}
 # << build pre
 
