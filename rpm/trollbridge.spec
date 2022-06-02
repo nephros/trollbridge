@@ -27,6 +27,26 @@ TRaveller's OLympus Bridge is an app for controlling Olympus OM-D/PEN/Air camera
 # >> setup
 #%setup -q -n example-app-%{version}
 rm -rf vendor
+# prepare go compiler
+tar -zxvf go1.17.4.linux-amd64.tar.gz
+export GOROOT=$PWD/go
+mkdir -p ~/gitwork/go/src
+mkdir ~/gitwork/go/bin
+mkdir ~/gitwork/go/pkg
+export GOPATH=~/gitwork/go
+go version
+# cross-compile:
+mkdir gobuild
+tar -C gobuild -zxvf go1.17.4..tar.gz
+cd gobuild/
+cd go
+cd src
+export GOARCH=arm64
+export GOROOT_BOOTSTRAP=$GOROOT
+export GOOS=linux
+./make.bootstrap
+rm -rf $GOROOT
+tar -C ~/go/ -xJvf ../../go-linux-arm64-bootstrap.tbz
 # << setup
 
 %build
@@ -35,12 +55,7 @@ GOPATH=%(pwd):~/
 GOROOT=~/go
 export GOPATH GOROOT
 cd %(pwd)
-if [ $DEB_HOST_ARCH == "armel" ]
-then
-~/go/bin/linux_arm/go build -ldflags "-s" -o %{name} 
-else
 ~/go/bin/go build -ldflags "-s" -o %{name}
-fi
 # << build pre
 
 # >> build post
