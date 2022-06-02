@@ -25,7 +25,7 @@ import (
 )
 
 // VERSION Returns the app version
-const VERSION = "0.1.2"
+const VERSION = "0.1.2.1"
 
 var (
 	config Config

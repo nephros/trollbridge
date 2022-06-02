@@ -5,7 +5,7 @@
 
 Name:       harbour-trollbridge
 Summary:    TRaveller's OLympus Bridge
-Version:    0.1.2
+Version:    0.1.2.1
 Release:    1
 Group:      Applications/Multimedia
 License:    MIT
