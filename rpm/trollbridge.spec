@@ -9,7 +9,9 @@ Version:    0.1.2.1
 Release:    1
 Group:      Applications/Multimedia
 License:    MIT
-Source: https://github.com/bundyo/trollbridge/archive/v%{version}.tar.gz
+URL: https://github.com/bundyo/trollbridge/
+#Source: https://github.com/bundyo/trollbridge/archive/v%%{version}.tar.gz
+Source: %{name}-%{version}.tar.gz
 Source1: go1.17.4.linux-armv6l.tar.gz
 Source2: go1.17.4.linux-arm64.tar.gz
 Source3: go1.17.4.linux-amd64.tar.gz
@@ -29,17 +31,16 @@ TRaveller's OLympus Bridge is an app for controlling Olympus OM-D/PEN/Air camera
 
 %prep
 # >> setup
-#%setup -q -n example-app-%{version}
+#%%setup -q -n example-app-%%{version}
 %setup -n %{name}-%{version}
 rm -rf vendor
 # << setup
 
 %build
 # >> build pre
-GOPATH=%(pwd):~/
+GOPATH=$PWD
 
-echo GOPATH: $GOPATH
-ls $GOPATH
+echo GOPATH is $GOPATH
 
 ## unpack the compiler tarball:
 mkdir -p $HOME/gohome
@@ -69,7 +70,6 @@ $HOME/gohome/go/bin/go version
 
 GOROOT=~/gohome/go
 export GOPATH GOROOT
-cd %(pwd)
 ~/gohome/go/bin/go build -ldflags "-s" -o %{name}
 # << build pre
 
