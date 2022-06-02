@@ -70,6 +70,8 @@ $HOME/gohome/go/bin/go version
 
 GOROOT=~/gohome/go
 export GOPATH GOROOT
+#~/gohome/go/bin/go mod init
+~/gohome/go/bin/go env -w GO111MODULE=off
 ~/gohome/go/bin/go build -ldflags "-s" -o %{name}
 # << build pre
 
