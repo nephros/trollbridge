@@ -104,14 +104,25 @@ func loadSettings() error {
 	if err != nil {
 		panic(err)
 	}
-	filename := fmt.Sprintf("%s/.config/harbour-trollbridge/settings_%s.json", path, VERSION)
+	// SailJail: try new location first:
+	filename := fmt.Sprintf("%s/.config/org.bundyo/TrollBridge/settings_%s.json", path, VERSION)
 	fmt.Printf("Trying to load settings from %s\n", filename)
 	f, err := os.Open(filename)
 	if err != nil {
 		config = Config{LastRun: time.Now(), DownloadPath: fmt.Sprintf("%s/Pictures/Olympus", path)}
 		return nil
+	} else {
+		f.Close()
+		filename := fmt.Sprintf("%s/.config/harbour-trollbridge/settings_%s.json", path, VERSION)
+		fmt.Printf("Trying to load settings from %s\n", filename)
+		f, err := os.Open(filename)
+		if err != nil {
+			config = Config{LastRun: time.Now(), DownloadPath: fmt.Sprintf("%s/Pictures/Olympus", path)}
+			return nil
+		}
 	}
 	defer f.Close()
+
 	jsondec := json.NewDecoder(f)
 	err = jsondec.Decode(&config)
 	if err != nil {
@@ -127,7 +138,9 @@ func saveSettings() error {
 		panic(err)
 	}
 
-	directory := fmt.Sprintf("%s/.config/harbour-trollbridge", path)
+	// SailJail: always write new location:
+	//directory := fmt.Sprintf("%s/.config/harbour-trollbridge", path)
+	directory := fmt.Sprintf("%s/.config/org.bundyo/TrollBridge/settings_%s.json", path)
 	if _, err := os.Stat(directory); os.IsNotExist(err) {
 		os.MkdirAll(directory, 0777)
 	}
