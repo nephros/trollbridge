@@ -9,7 +9,7 @@ Version:    0.1.2
 Release:    1
 Group:      Applications/Multimedia
 License:    MIT
-#Source0: https://github.com/example/app/archive/v%{version}.tar.gz
+Source: https://github.com/bundyo/trollbridge/archive/v%{version}.tar.gz
 #Requires:   mapplauncherd-booster-silica-qt5
 #Requires:   nemo-qml-plugin-thumbnailer-qt5
 Requires:   sailfishsilica-qt5
