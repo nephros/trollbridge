@@ -2,7 +2,7 @@ package main
 
 import (
 	"encoding/json"
-	"launchpad.net/xmlpath"
+	"github.com/masterzen/xmlpath"
 	"strings"
 	"strconv"
 	"errors"
@@ -15,7 +15,7 @@ import (
 	"net/http"
 	"io"
 	"io/ioutil"
-	"gopkg.in/qml.v1"
+	"github.com/neclepsio/qml"
 	"os"
 	//"math/rand"
 	//"os/signal"

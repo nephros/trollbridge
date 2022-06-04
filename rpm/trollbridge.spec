@@ -79,11 +79,16 @@ $HOME/gohome/go/bin/go version
 
 GOROOT=~/gohome/go
 export GOPATH GOROOT
+~/gohome/go/bin/go env -w GO111MODULE=auto
 #~/gohome/go/bin/go mod init
 #~/gohome/go/bin/go env -w GO111MODULE=off
 #~/gohome/go/bin/go list -m all
+# original deps:
 #~/gohome/go/bin/go get gopkg.in/qml.v1
 #~/gohome/go/bin/go get launchpad.net/xmlpath
+# more modern deps:
+#~/gohome/go/bin/go get github.com/neclepsio/qml
+#~/gohome/go/bin/go get github.com/masterzen/xmlpath
 ~/gohome/go/bin/go build -pkgdir $GOROOT/pkg/ -ldflags "-s" -o %{name}
 # << build pre
 
