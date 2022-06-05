@@ -79,15 +79,22 @@ export GOFLAGS="-buildmode=pie -modcacherw"
 
 #~/gohome/go/bin/go env -w GO111MODULE=auto
 #~/gohome/go/bin/go build -ldflags "-s" -o %{name}
-[ ! -e go.mod ] && ~/gohome/go/bin/go mod init trollbridge
+if [ ! -e go.mod ]; then
+~/gohome/go/bin/go mod init trollbridge
 #~/gohome/go/bin/go get  github.com/neclepsio/qml@4d1f36b
+#~/gohome/go/bin/go get github.com/nanu-c/qml-go@master
 #~/gohome/go/bin/go mod tidy
+#~/gohome/go/bin/go install
 #~/gohome/go/bin/go mod vendor
+fi
 export GOFLAGS="-buildmode=pie -modcacherw -trimpath"
 #sed -i 's@^func Addrs@//func Addrs@' vendor/github.com/neclepsio/qml/cdata/cdata.go
 #sed -i 's@^func Addrs@//func Addrs@' ../../go/pkg/mod/github.com/neclepsio/qml/cdata/cdata.go
-~/gohome/go/bin/go build -mod=vendor -ldflags "-s" -o %{name}
-#~/gohome/go/bin/go build -ldflags "-s" -o %{name}
+#~/gohome/go/bin/go build -mod=vendor -ldflags "-s" -o %{name}
+#~/gohome/go/bin/go build -mod=vendor -ldflags "-s" -o %{name}
+~/gohome/go/bin/go get github.com/masterzen/xmlpath
+~/gohome/go/bin/go get github.com/nanu-c/qml-go
+~/gohome/go/bin/go build -ldflags "-s" -o %{name}
 # << build pre
 
 # >> build post

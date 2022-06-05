@@ -15,7 +15,7 @@ import (
 	"net/http"
 	"io"
 	"io/ioutil"
-	"github.com/neclepsio/qml"
+	"github.com/nanu-c/qml-go"
 	"os"
 	//"math/rand"
 	//"os/signal"
