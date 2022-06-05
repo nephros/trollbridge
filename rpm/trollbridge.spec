@@ -15,10 +15,6 @@ Source: %{name}-%{version}.tar.gz
 Source1: go1.17.4.linux-armv6l.tar.gz
 Source2: go1.17.4.linux-arm64.tar.gz
 Source3: go1.17.4.linux-amd64.tar.gz
-Source4: go_qml.v1.tar.gz
-Source5: launchpad.net_xmlpath.tar.gz
-Source6: dependencies_src.tar.gz
-Source7: vendor.tar.gz
 
 #Requires:   mapplauncherd-booster-silica-qt5
 #Requires:   nemo-qml-plugin-thumbnailer-qt5
@@ -69,13 +65,6 @@ gunzip -dc %{SOURCE3} | tar -xof -
 export GOARCH=386
 %endif
 
-# install deps
-pushd go
-#gunzip -dc %{SOURCE4} | tar -xof -
-#gunzip -dc %{SOURCE5} | tar -xof -
-#gunzip -dc %{SOURCE6} | tar -xof -
-popd
-
 popd
 
 $HOME/gohome/go/bin/go version
@@ -83,20 +72,8 @@ $HOME/gohome/go/bin/go version
 GOROOT=~/gohome/go
 export GOPATH GOROOT
 ~/gohome/go/bin/go env -w GO111MODULE=auto
-#~/gohome/go/bin/go mod init
-#~/gohome/go/bin/go env -w GO111MODULE=off
-#~/gohome/go/bin/go list -m all
-# original deps:
-#~/gohome/go/bin/go get gopkg.in/qml.v1
-#~/gohome/go/bin/go get launchpad.net/xmlpath
-# more modern deps:
-#~/gohome/go/bin/go get github.com/neclepsio/qml
-#~/gohome/go/bin/go get github.com/masterzen/xmlpath
-
-gunzip -dc %{SOURCE7} | tar -xof -
-#~/gohome/go/bin/go build -pkgdir $GOROOT/pkg/ -ldflags "-s" -o %{name}
 #~/gohome/go/bin/go build -ldflags "-s" -o %{name}
-~/gohome/go/bin/go mod init trollbridge
+#~/gohome/go/bin/go mod init trollbridge
 ~/gohome/go/bin/go build -mod=vendor -buildmode=pie -ldflags "-s" -o %{name}
 # << build pre
 
