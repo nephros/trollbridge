@@ -38,9 +38,6 @@ rm -rf vendor
 
 %build
 # >> build pre
-#GOPATH=$PWD
-
-#echo GOPATH is $GOPATH
 
 ## unpack the compiler tarball:
 mkdir -p $HOME/gohome
@@ -70,6 +67,7 @@ popd
 $HOME/gohome/go/bin/go version
 
 GOROOT=~/gohome/go
+GOPATH=$PWD
 export GOPATH GOROOT
 export CGO_LDFLAGS="$LDFLAGS"
 export CGO_CFLAGS="$CFLAGS"
@@ -77,12 +75,12 @@ export CGO_CPPFLAGS="$CPPFLAGS"
 export CGO_CXXFLAGS="$CXXFLAGS"
 export GOFLAGS="-buildmode=pie -modcacherw"
 
-~/gohome/go/bin/go env -w GO111MODULE=auto
+#~/gohome/go/bin/go env -w GO111MODULE=auto
 #~/gohome/go/bin/go build -ldflags "-s" -o %{name}
 #~/gohome/go/bin/go mod init trollbridge
-~/gohome/go/bin/go mod tidy
+#~/gohome/go/bin/go mod tidy
 export GOFLAGS="-buildmode=pie -modcacherw -trimpath"
-~/gohome/go/bin/go build -mod=vendor -ldflags "-s" -o %{name}
+~/gohome/go/bin/go build -ldflags "-s" -o %{name}
 # << build pre
 
 # >> build post
