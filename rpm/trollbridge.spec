@@ -38,9 +38,9 @@ rm -rf vendor
 
 %build
 # >> build pre
-GOPATH=$PWD
+#GOPATH=$PWD
 
-echo GOPATH is $GOPATH
+#echo GOPATH is $GOPATH
 
 ## unpack the compiler tarball:
 mkdir -p $HOME/gohome
