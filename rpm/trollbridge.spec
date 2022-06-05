@@ -74,6 +74,8 @@ export GOPATH GOROOT
 ~/gohome/go/bin/go env -w GO111MODULE=auto
 #~/gohome/go/bin/go build -ldflags "-s" -o %{name}
 #~/gohome/go/bin/go mod init trollbridge
+patch -p1 < patches/cdata.patch
+~/gohome/go/bin/go mod tidy
 ~/gohome/go/bin/go build -mod=vendor -buildmode=pie -ldflags "-s" -o %{name}
 # << build pre
 
