@@ -17,6 +17,7 @@ Source2: go1.17.4.linux-arm64.tar.gz
 Source3: go1.17.4.linux-amd64.tar.gz
 Source4: go_qml.v1.tar.gz
 Source5: launchpad.net_xmlpath.tar.gz
+Source6: dependencies_src.tar.gz
 
 #Requires:   mapplauncherd-booster-silica-qt5
 #Requires:   nemo-qml-plugin-thumbnailer-qt5
@@ -69,8 +70,9 @@ export GOARCH=386
 
 # install deps
 pushd go
-gunzip -dc %{SOURCE4} | tar -xof -
-gunzip -dc %{SOURCE5} | tar -xof -
+#gunzip -dc %{SOURCE4} | tar -xof -
+#gunzip -dc %{SOURCE5} | tar -xof -
+gunzip -dc %{SOURCE6} | tar -xof -
 popd
 
 popd
