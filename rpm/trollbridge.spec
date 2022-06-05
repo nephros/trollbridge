@@ -96,7 +96,8 @@ export GOPATH GOROOT
 gunzip -dc %{SOURCE7} | tar -xof -
 #~/gohome/go/bin/go build -pkgdir $GOROOT/pkg/ -ldflags "-s" -o %{name}
 #~/gohome/go/bin/go build -ldflags "-s" -o %{name}
-~/gohome/go/bin/go build -mod=vendor -ldflags "-s" -o %{name}
+~/gohome/go/bin/go mod init trollbridge
+~/gohome/go/bin/go build -mod=vendor -buildmode=pie -ldflags "-s" -o %{name}
 # << build pre
 
 # >> build post
