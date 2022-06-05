@@ -18,6 +18,7 @@ Source3: go1.17.4.linux-amd64.tar.gz
 Source4: go_qml.v1.tar.gz
 Source5: launchpad.net_xmlpath.tar.gz
 Source6: dependencies_src.tar.gz
+Source7: vendor.tar.gz
 
 #Requires:   mapplauncherd-booster-silica-qt5
 #Requires:   nemo-qml-plugin-thumbnailer-qt5
@@ -72,7 +73,7 @@ export GOARCH=386
 pushd go
 #gunzip -dc %{SOURCE4} | tar -xof -
 #gunzip -dc %{SOURCE5} | tar -xof -
-gunzip -dc %{SOURCE6} | tar -xof -
+#gunzip -dc %{SOURCE6} | tar -xof -
 popd
 
 popd
@@ -91,7 +92,11 @@ export GOPATH GOROOT
 # more modern deps:
 #~/gohome/go/bin/go get github.com/neclepsio/qml
 #~/gohome/go/bin/go get github.com/masterzen/xmlpath
-~/gohome/go/bin/go build -pkgdir $GOROOT/pkg/ -ldflags "-s" -o %{name}
+
+gunzip -dc %{SOURCE7} | tar -xof -
+#~/gohome/go/bin/go build -pkgdir $GOROOT/pkg/ -ldflags "-s" -o %{name}
+#~/gohome/go/bin/go build -ldflags "-s" -o %{name}
+~/gohome/go/bin/go build -mod=vendor -ldflags "-s" -o %{name}
 # << build pre
 
 # >> build post
