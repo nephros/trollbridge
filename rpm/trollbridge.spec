@@ -52,7 +52,9 @@ export GOARCH=arm
 
 %ifarch aarch64
 echo we are arm64
+if [ ! -e go ]; then
 gunzip -dc %{SOURCE2} | tar -xof -
+fi
 export GOARCH=arm64
 %endif
 
@@ -77,11 +79,15 @@ export GOFLAGS="-buildmode=pie -modcacherw"
 
 #~/gohome/go/bin/go env -w GO111MODULE=auto
 #~/gohome/go/bin/go build -ldflags "-s" -o %{name}
-~/gohome/go/bin/go mod init trollbridge
+[ ! -e go.mod ] && ~/gohome/go/bin/go mod init trollbridge
+#~/gohome/go/bin/go get  github.com/neclepsio/qml@4d1f36b
 #~/gohome/go/bin/go mod tidy
-~/gohome/go/bin/go mod vendor
+#~/gohome/go/bin/go mod vendor
 export GOFLAGS="-buildmode=pie -modcacherw -trimpath"
+#sed -i 's@^func Addrs@//func Addrs@' vendor/github.com/neclepsio/qml/cdata/cdata.go
+#sed -i 's@^func Addrs@//func Addrs@' ../../go/pkg/mod/github.com/neclepsio/qml/cdata/cdata.go
 ~/gohome/go/bin/go build -mod=vendor -ldflags "-s" -o %{name}
+#~/gohome/go/bin/go build -ldflags "-s" -o %{name}
 # << build pre
 
 # >> build post
