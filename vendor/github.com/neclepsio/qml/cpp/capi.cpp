@@ -1,13 +1,10 @@
-#include <QGuiApplication>
-#include <QQuickView>
-#include <QQuickItem>
-#include <QtQml>
-#include <QDebug>
-#include <QQuickImageProvider>
-
-#include <sailfishapp.h>
-
-#include <QtCore/QTranslator>
+#include <QtWidgets/QApplication>
+#include <QtQuick/QQuickView>
+#include <QtQuick/QQuickItem>
+#include <QtQml/QtQml>
+#include <QtCore/QDebug>
+#include <QtQuick/QQuickImageProvider>
+#include <QtGui/QIcon>
 
 #include <string.h>
 
@@ -15,21 +12,6 @@
 #include "govaluetype.h"
 #include "connector.h"
 #include "capi.h"
-
-QGuiApplication *app;
-QQuickView *sfview;
-
-void newTranslator(QString_ *i18nroot)
-{
-    QString *root = reinterpret_cast<QString *>(i18nroot);
-    QTranslator *translator = new QTranslator;
-    if (translator->load(QLatin1String("qml_") + QLocale::system().name(), *root)) {
-        QCoreApplication::installTranslator(translator);
-        qDebug() << "Found i18n for " + QLocale::system().name();
-    } else {
-        qDebug() << "No translations found for language " + QLatin1String("qml_") + QLocale::system().name();
-    }
-}
 
 static char *local_strdup(const char *str)
 {
@@ -46,7 +28,7 @@ error *errorf(const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    QString str = QString().vsprintf(format, ap);
+    QString str = QString().vasprintf(format, ap);
     va_end(ap);
     QByteArray ba = str.toUtf8();
     return local_strdup(ba.constData());
@@ -56,22 +38,10 @@ void panicf(const char *format, ...)
 {
     va_list ap;
     va_start(ap, format);
-    QString str = QString().vsprintf(format, ap);
+    QString str = QString().vasprintf(format, ap);
     va_end(ap);
     QByteArray ba = str.toUtf8();
     hookPanic(local_strdup(ba.constData()));
-}
-
-void sailfishnewGuiApplication()
-{
-    static char empty[1] = {0};
-    static char *argv[] = {empty, 0};
-    static int argc = 1;
-
-    app = SailfishApp::application(argc, argv);
-
-    // The event loop should never die.
-    app->setQuitOnLastWindowClosed(false);
 }
 
 void newGuiApplication()
@@ -79,16 +49,10 @@ void newGuiApplication()
     static char empty[1] = {0};
     static char *argv[] = {empty, 0};
     static int argc = 1;
-
-    new QGuiApplication(argc, argv);
+    new QApplication(argc, argv);
 
     // The event loop should never die.
     qApp->setQuitOnLastWindowClosed(false);
-}
-
-void sailfishapplicationExec()
-{
-    app->exec();
 }
 
 void applicationExec()
@@ -96,19 +60,9 @@ void applicationExec()
     qApp->exec();
 }
 
-void sailfishapplicationExit()
-{
-    app->exit(0);
-}
-
 void applicationExit()
 {
     qApp->exit(0);
-}
-
-void sailfishapplicationFlushAll()
-{
-    app->processEvents();
 }
 
 void applicationFlushAll()
@@ -130,12 +84,6 @@ void *currentThread()
 void *appThread()
 {
     return QCoreApplication::instance()->thread();
-}
-
-QQmlEngine_ *newSailfishEngine()
-{
-    sfview = SailfishApp::createView();
-    return sfview->engine();
 }
 
 QQmlEngine_ *newEngine(QObject_ *parent)
@@ -274,13 +222,6 @@ void engineAddImageProvider(QQmlEngine_ *engine, QString_ *providerId, void *ima
     qengine->addImageProvider(*qproviderId, new GoImageProvider(imageFunc));
 }
 
-void sailfishSetSource(const char *url, int urlLen)
-{
-    QByteArray qurl(url, urlLen);
-    QString qsurl = QString::fromUtf8(qurl);
-    sfview->setSource(SailfishApp::pathTo(qsurl));
-}
-
 void componentLoadURL(QQmlComponent_ *component, const char *url, int urlLen)
 {
     QByteArray qurl(url, urlLen);
@@ -320,11 +261,6 @@ QObject_ *componentCreate(QQmlComponent_ *component, QQmlContext_ *context)
     return qcomponent->create(qcontext);
 }
 
-QQuickWindow_ *sailfishCreateWindow()
-{
-    return sfview;
-}
-
 QQuickWindow_ *componentCreateWindow(QQmlComponent_ *component, QQmlContext_ *context)
 {
     QQmlComponent *qcomponent = reinterpret_cast<QQmlComponent *>(component);
@@ -352,11 +288,6 @@ struct DoShowWindow : public QQuickWindow {
     }
 };
 
-void sailfishwindowShow()
-{
-    sfview->show();
-}
-
 void windowShow(QQuickWindow_ *win)
 {
     reinterpret_cast<DoShowWindow *>(win)->show();
@@ -372,43 +303,12 @@ uintptr_t windowPlatformId(QQuickWindow_ *win)
     return reinterpret_cast<QQuickWindow *>(win)->winId();
 }
 
-void destroyMe(QQuickCloseEvent *close)
-{
-    qDebug() << "Ok, called.";
-}
-
-
-class CloseEventFilter : public QObject
-{
-     Q_OBJECT
-public:
-     CloseEventFilter(QObject *parent) : QObject(parent) {}
-
-protected: 
-     bool eventFilter(QObject *obj, QEvent *event)
-     {
-          if (event->type() == QEvent::Close)
-          {
-            hookWindowHidden(obj);
-          }
-
-          return QObject::eventFilter(obj, event);
-     }
-};
-
-
 void windowConnectHidden(QQuickWindow_ *win)
 {
     QQuickWindow *qwin = reinterpret_cast<QQuickWindow *>(win);
-    // Test
-    CloseEventFilter *closeFilter = new CloseEventFilter(qwin);
-    qwin->installEventFilter(closeFilter);
-    // Test End
     QObject::connect(qwin, &QWindow::visibleChanged, [=](bool visible){
         if (!visible) {
-            // Disabled this because on SailfishOS switching to cover screen will exit application!
-            //hookWindowHidden(win);
-            //qDebug() << "hookWindowHidden() called";
+            hookWindowHidden(win);
         }
     });
 }
@@ -562,7 +462,7 @@ error *objectSetProperty(QObject_ *object, const char *name, DataValue *value)
     } else {
         int varType = var.userType();
         QVariant saved = var;
-        if (propType != varType && !var.convert(propType) && propType != QMetaType::QUrl) {
+        if (propType != varType && !var.convert(propType)) {
             if (varType == QMetaType::QObjectStar) {
                 return errorf("cannot set property \"%s\" with type %s to value of %s*",
                         name, QMetaType::typeName(propType), saved.value<QObject*>()->metaObject()->className());
@@ -595,6 +495,11 @@ error *objectInvoke(QObject_ *object, const char *method, int methodLen, DataVal
     if (paramsLen > 10) {
         panicf("fix the parameter dispatching");
     }
+
+    if (qobject == 0) {
+      return errorf("method called on null object: %s", method);
+    }
+
     const QMetaObject *metaObject = qobject->metaObject();
     // Walk backwards so descendants have priority.
     for (int i = metaObject->methodCount()-1; i >= 0; i--) {
@@ -610,10 +515,10 @@ error *objectInvoke(QObject_ *object, const char *method, int methodLen, DataVal
 
                 bool ok;
                 if (metaMethod.returnType() == QMetaType::Void) {
-                    ok = QMetaObject::invokeMethod(qobject, metaMethod.name(), Qt::DirectConnection, 
+                    ok = metaMethod.invoke(qobject, Qt::DirectConnection,
                         arg[0], arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8], arg[9]);
                 } else {
-                    ok = QMetaObject::invokeMethod(qobject, metaMethod.name(), Qt::DirectConnection, Q_RETURN_ARG(QVariant, result),
+                    ok = metaMethod.invoke(qobject, Qt::DirectConnection, Q_RETURN_ARG(QVariant, result),
                         arg[0], arg[1], arg[2], arg[3], arg[4], arg[5], arg[6], arg[7], arg[8], arg[9]);
                 }
                 if (!ok) {
@@ -633,7 +538,7 @@ void objectFindChild(QObject_ *object, QString_ *name, DataValue *resultdv)
 {
     QObject *qobject = reinterpret_cast<QObject *>(object);
     QString *qname = reinterpret_cast<QString *>(name);
-   
+
     QVariant var;
     QObject *result = qobject->findChild<QObject *>(*qname);
     if (result) {
@@ -704,14 +609,14 @@ int objectIsView(QObject_ *object)
 error *objectGoRef(QObject_ *object, GoRef *ref)
 {
     QObject *qobject = static_cast<QObject *>(object);
-    GoValue *goValue = dynamic_cast<GoValue *>(qobject);
-    if (goValue) {
+    if (qobject->inherits("GoValue")) {
+        GoValue *goValue = static_cast<GoValue *>(qobject);
         *ref = goValue->ref;
         return 0;
     }
-    GoPaintedValue *goPaintedValue = dynamic_cast<GoPaintedValue *>(qobject);
-    if (goPaintedValue) {
-        *ref= goPaintedValue->ref;
+    if (qobject->inherits("GoPaintedValue")) {
+        GoPaintedValue *goPaintedValue = static_cast<GoPaintedValue *>(qobject);
+        *ref = goPaintedValue->ref;
         return 0;
     }
     return errorf("QML object is not backed by a Go value");
@@ -786,9 +691,6 @@ void unpackDataValue(DataValue *value, QVariant_ *var)
         break;
     case DTColor:
         *qvar = QColor::fromRgba(*(QRgb*)(value->data));
-        break;
-    case DTDateTime:
-        *qvar = QDateTime::fromTime_t(*(quint32*)(value->data));
         break;
     case DTVariantList:
         *qvar = **(QVariantList**)(value->data);
@@ -870,21 +772,6 @@ void packDataValue(QVariant_ *var, DataValue *value)
         value->dataType = DTColor;
         *(unsigned int*)(value->data) = qvar->value<QColor>().rgba();
         break;
-    case QMetaType::QDateTime:
-        value->dataType = DTDateTime;
-        *(quint32*)(value->data) = qvar->toUInt();
-        break;
-    case QMetaType::User:
-        {
-            if (qvar->userType() == 1034) {
-                auto var = qvar->value<QJSValue>().toVariant();
-                packDataValue(&var, value);
-            } else {
-                qDebug() << "user-type = " << qvar->userType() << " name = " << QVariant::typeToName(qvar->userType());
-            }
-        }
-        break;
-
     case QMetaType::QVariantList:
         {
             QVariantList varlist = qvar->toList();
@@ -933,12 +820,12 @@ void packDataValue(QVariant_ *var, DataValue *value)
             QObject *qobject = qvar->value<QObject *>();
             if (qobject->inherits("GoValue")) {
                 value->dataType = DTGoAddr;
-                *(uintptr_t*)(value->data) = goValue->ref;
+                *(uintptr_t*)(value->data) = (static_cast<GoValue*>(qobject))->ref;
                 break;
             }
             if (qobject->inherits("GoPaintedValue")) {
                 value->dataType = DTGoAddr;
-                *(uintptr_t*)(value->data) = goPaintedValue->ref;
+                *(uintptr_t*)(value->data) = (static_cast<GoPaintedValue*>(qobject))->ref;
                 break;
             }
             value->dataType = DTObject;
@@ -996,30 +883,32 @@ QVariantList_ *newVariantList(DataValue *list, int len)
 
 QObject *listPropertyAt(QQmlListProperty<QObject> *list, int i)
 {
-    return reinterpret_cast<QObject *>(hookListPropertyAt((uintptr_t)list->data, (intptr_t)list->dummy1, (intptr_t)list->dummy2, i));
+    void** data = (void**)list->data;
+    return reinterpret_cast<QObject *>(hookListPropertyAt((uintptr_t)data[0], (intptr_t)data[1], (intptr_t)data[2], i));
 }
 
 int listPropertyCount(QQmlListProperty<QObject> *list)
 {
-    return hookListPropertyCount((uintptr_t)list->data, (intptr_t)list->dummy1, (intptr_t)list->dummy2);
+    void** data = (void**)list->data;
+    return hookListPropertyCount((uintptr_t)data[0], (intptr_t)data[1], (intptr_t)data[2]);
 }
 
 void listPropertyAppend(QQmlListProperty<QObject> *list, QObject *obj)
 {
-    hookListPropertyAppend((uintptr_t)list->data, (intptr_t)list->dummy1, (intptr_t)list->dummy2, obj);
+    void** data = (void**)list->data;
+    hookListPropertyAppend((uintptr_t)data[0], (intptr_t)data[1], (intptr_t)data[2], obj);
 }
 
 void listPropertyClear(QQmlListProperty<QObject> *list)
 {
-    hookListPropertyClear((uintptr_t)list->data, (intptr_t)list->dummy1, (intptr_t)list->dummy2);
+    void** data = (void**)list->data;
+    hookListPropertyClear((uintptr_t)data[0], (intptr_t)data[1], (intptr_t)data[2]);
 }
 
 QQmlListProperty_ *newListProperty(GoRef ref, intptr_t reflectIndex, intptr_t setIndex)
 {
     QQmlListProperty<QObject> *list = new QQmlListProperty<QObject>();
-    list->data = (void*)ref;
-    list->dummy1 = (void*)reflectIndex;
-    list->dummy2 = (void*)setIndex;
+    list->data = new void*[3] { (void*)ref, (void*)reflectIndex, (void*)setIndex };
     list->at = listPropertyAt;
     list->count = listPropertyCount;
     list->append = listPropertyAppend;

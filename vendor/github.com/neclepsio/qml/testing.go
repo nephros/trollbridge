@@ -10,7 +10,7 @@ import (
 	"reflect"
 	"unsafe"
 
-	"github.com/neclepsio/qml/cdata"
+	"github.com/nanu-c/qml-go/cdata"
 )
 
 const pageSize = 4096

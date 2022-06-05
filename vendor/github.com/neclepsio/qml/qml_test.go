@@ -15,11 +15,13 @@ import (
 	"testing"
 	"time"
 
-	. "gopkg.in/check.v1"
-	"github.com/neclepsio/qml"
-	"github.com/neclepsio/qml/cpptest"
-	"github.com/neclepsio/qml/gl/2.0"
 	"path/filepath"
+
+	"github.com/nanu-c/qml-go"
+	"github.com/nanu-c/qml-go/cpptest"
+	"github.com/nanu-c/qml-go/gl/2.0"
+	"github.com/nanu-c/qml-go/qpainter"
+	. "gopkg.in/check.v1"
 )
 
 func init() { qml.SetupTesting() }
@@ -79,10 +81,8 @@ type GoRect struct {
 	PaintCount int
 }
 
-func (r *GoRect) Paint(p *qml.Painter) {
+func (r *GoRect) Paint(obj qml.Object, p *qpainter.Painter) {
 	r.PaintCount++
-
-	obj := p.Object()
 
 	gl := GL.API(p)
 

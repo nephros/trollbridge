@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/neclepsio/qml"
+	"github.com/nanu-c/qml-go"
 )
 
 func main() {

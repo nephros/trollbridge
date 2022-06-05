@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/neclepsio/qml"
+	"github.com/nanu-c/qml-go"
 )
 
 func main() {
