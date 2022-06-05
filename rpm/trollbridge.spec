@@ -79,7 +79,7 @@ export GOFLAGS="-buildmode=pie -modcacherw"
 #~/gohome/go/bin/go build -ldflags "-s" -o %{name}
 ~/gohome/go/bin/go mod init trollbridge
 #~/gohome/go/bin/go mod tidy
-~/gohome/go/bin/go mod vendor
+#~/gohome/go/bin/go mod vendor
 export GOFLAGS="-buildmode=pie -modcacherw -trimpath"
 ~/gohome/go/bin/go build -mod=vendor -ldflags "-s" -o %{name}
 # << build pre
