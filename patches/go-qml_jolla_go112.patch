@@ -1,0 +1,411 @@
+diff --git a/bridge.go b/bridge.go
+index 157fedb..52e7ecf 100644
+--- a/bridge.go
++++ b/bridge.go
+@@ -38,6 +38,34 @@ func init() {
+ 	guiMainRef = cdata.Ref()
+ }
+ 
++// Special Run() function to launch Jolla SailfishOS applications.
++// Run runs the main QML event loop, runs f, and then terminates the
++// event loop once f returns.
++//
++// Most functions from the qml package block until Run is called.
++//
++// The Run function must necessarily be called from the same goroutine as
++// the main function or the application may fail when running on Mac OS.
++func SailfishRun(f func() error) error {
++	if cdata.Ref() != guiMainRef {
++		panic("Run must be called on the initial goroutine so apps are portable to Mac OS")
++	}
++	if !atomic.CompareAndSwapInt32(&initialized, 0, 1) {
++		panic("qml.Run called more than once")
++	}
++	C.sailfishnewGuiApplication()
++	C.idleTimerInit((*C.int32_t)(&guiIdleRun))
++	done := make(chan error, 1)
++	go func() {
++		RunMain(func() {}) // Block until the event loop is running.
++		done <- f()
++		C.sailfishapplicationExit()
++	}()
++	C.sailfishapplicationExec()
++	return <-done
++}
++
++
+ // Run runs the main QML event loop, runs f, and then terminates the
+ // event loop once f returns.
+ //
+@@ -117,6 +145,14 @@ func Unlock() {
+ 	})
+ }
+ 
++// Flush synchronously flushes all pending QML activities for Sailfish application
++func SailfishFlush() {
++	// TODO Better testing for this.
++	RunMain(func() {
++		C.sailfishapplicationFlushAll()
++	})
++}
++
+ // Flush synchronously flushes all pending QML activities.
+ func Flush() {
+ 	// TODO Better testing for this.
+diff --git a/cpp/capi.cpp b/cpp/capi.cpp
+index 363a244..d223d0e 100644
+--- a/cpp/capi.cpp
++++ b/cpp/capi.cpp
+@@ -1,4 +1,4 @@
+-#include <QtWidgets/QApplication>
++#include <QGuiApplication>
+ #include <QtQuick/QQuickView>
+ #include <QtQuick/QQuickItem>
+ #include <QtQml/QtQml>
+@@ -6,6 +6,10 @@
+ #include <QtQuick/QQuickImageProvider>
+ #include <QtGui/QIcon>
+ 
++#include <sailfishapp.h>
++
++#include <QtCore/QTranslator>
++
+ #include <string.h>
+ 
+ #include "govalue.h"
+@@ -13,6 +17,33 @@
+ #include "connector.h"
+ #include "capi.h"
+ 
++QGuiApplication *app;
++QQuickView *sfview;
++
++void newTranslator(QString_ *i18nroot)
++{
++    QString *root = reinterpret_cast<QString *>(i18nroot);
++    QTranslator *translator = new QTranslator;
++    if (translator->load(QLatin1String("qml_") + QLocale::system().name(), *root)) {
++        QCoreApplication::installTranslator(translator);
++        qDebug() << "Found i18n for " + QLocale::system().name();
++    } else {
++        qDebug() << "No translations found for language " + QLatin1String("qml_") + QLocale::system().name();
++    }
++}
++
++void sailfishnewGuiApplication()
++{
++    static char empty[1] = {0};
++    static char *argv[] = {empty, 0};
++    static int argc = 1;
++
++    app = SailfishApp::application(argc, argv);
++
++    // The event loop should never die.
++    app->setQuitOnLastWindowClosed(false);
++}
++
+ static char *local_strdup(const char *str)
+ {
+     char *strcopy = 0;
+@@ -49,22 +80,37 @@ void newGuiApplication()
+     static char empty[1] = {0};
+     static char *argv[] = {empty, 0};
+     static int argc = 1;
+-    new QApplication(argc, argv);
++    new QGuiApplication(argc, argv);
+ 
+     // The event loop should never die.
+     qApp->setQuitOnLastWindowClosed(false);
+ }
+ 
++void sailfishapplicationExec()
++{
++    app->exec();
++}
++
+ void applicationExec()
+ {
+     qApp->exec();
+ }
+ 
++void sailfishapplicationExit()
++{
++    app->exit(0);
++}
++
+ void applicationExit()
+ {
+     qApp->exit(0);
+ }
+ 
++void sailfishapplicationFlushAll()
++{
++    app->processEvents();
++}
++
+ void applicationFlushAll()
+ {
+     qApp->processEvents();
+@@ -86,6 +132,12 @@ void *appThread()
+     return QCoreApplication::instance()->thread();
+ }
+ 
++QQmlEngine_ *newSailfishEngine()
++{
++    sfview = SailfishApp::createView();
++    return sfview->engine();
++}
++
+ QQmlEngine_ *newEngine(QObject_ *parent)
+ {
+     return new QQmlEngine(reinterpret_cast<QObject *>(parent));
+@@ -222,6 +274,13 @@ void engineAddImageProvider(QQmlEngine_ *engine, QString_ *providerId, void *ima
+     qengine->addImageProvider(*qproviderId, new GoImageProvider(imageFunc));
+ }
+ 
++void sailfishSetSource(const char *url, int urlLen)
++{
++    QByteArray qurl(url, urlLen);
++    QString qsurl = QString::fromUtf8(qurl);
++    sfview->setSource(SailfishApp::pathTo(qsurl));
++}
++
+ void componentLoadURL(QQmlComponent_ *component, const char *url, int urlLen)
+ {
+     QByteArray qurl(url, urlLen);
+@@ -261,6 +320,11 @@ QObject_ *componentCreate(QQmlComponent_ *component, QQmlContext_ *context)
+     return qcomponent->create(qcontext);
+ }
+ 
++QQuickWindow_ *sailfishCreateWindow()
++{
++    return sfview;
++}
++
+ QQuickWindow_ *componentCreateWindow(QQmlComponent_ *component, QQmlContext_ *context)
+ {
+     QQmlComponent *qcomponent = reinterpret_cast<QQmlComponent *>(component);
+@@ -287,6 +351,11 @@ struct DoShowWindow : public QQuickWindow {
+         resizeEvent(&resize);
+     }
+ };
++ 
++void sailfishwindowShow()
++{
++    sfview->show();
++}
+ 
+ void windowShow(QQuickWindow_ *win)
+ {
+@@ -303,12 +372,40 @@ uintptr_t windowPlatformId(QQuickWindow_ *win)
+     return reinterpret_cast<QQuickWindow *>(win)->winId();
+ }
+ 
++ 
++void destroyMe(QQuickCloseEvent *close)
++{
++    qDebug() << "Ok, called.";
++}
++
++
++class CloseEventFilter : public QObject
++{
++     Q_OBJECT
++public:
++     CloseEventFilter(QObject *parent) : QObject(parent) {}
++
++protected: 
++     bool eventFilter(QObject *obj, QEvent *event)
++     {
++          if (event->type() == QEvent::Close)
++          {
++            hookWindowHidden(obj);
++          }
++
++          return QObject::eventFilter(obj, event);
++     }
++};
++
++
+ void windowConnectHidden(QQuickWindow_ *win)
+ {
+     QQuickWindow *qwin = reinterpret_cast<QQuickWindow *>(win);
+     QObject::connect(qwin, &QWindow::visibleChanged, [=](bool visible){
+         if (!visible) {
+-            hookWindowHidden(win);
++            // Disabled this because on SailfishOS switching to cover screen will exit application!
++            //hookWindowHidden(win);
++            //qDebug() << "hookWindowHidden() called";
+         }
+     });
+ }
+diff --git a/cpp/capi.h b/cpp/capi.h
+index 177415d..bd4e424 100644
+--- a/cpp/capi.h
++++ b/cpp/capi.h
+@@ -108,18 +108,26 @@ typedef struct {
+     int line;
+ } LogMessage;
+ 
++
+ void newGuiApplication();
++void sailfishnewGuiApplication();
+ void applicationExec();
++void sailfishapplicationExec();
+ void applicationExit();
++void sailfishapplicationExit();
+ void applicationFlushAll();
++void sailfishapplicationFlushAll();
+ void setWindowIcon(QString_ *path);
+-
++ 
+ void idleTimerInit(int32_t *guiIdleRun);
+ void idleTimerStart();
+ 
+ void *currentThread();
+ void *appThread();
+ 
++void newTranslator(QString_ *translatorRoot);
++QQmlEngine_ *newSailfishEngine();
++
+ QQmlEngine_ *newEngine(QObject_ *parent);
+ QQmlContext_ *engineRootContext(QQmlEngine_ *engine);
+ void engineSetOwnershipCPP(QQmlEngine_ *engine, QObject_ *object);
+@@ -154,16 +162,20 @@ error *objectConnect(QObject_ *object, const char *signal, int signalLen, QQmlEn
+ error *objectGoRef(QObject_ *object, GoRef *ref);
+ 
+ QQmlComponent_ *newComponent(QQmlEngine_ *engine, QObject_ *parent);
++void sailfishSetSource(const char *url, int urlLen);
+ void componentLoadURL(QQmlComponent_ *component, const char *url, int urlLen);
+ void componentSetData(QQmlComponent_ *component, const char *data, int dataLen, const char *url, int urlLen);
+ char *componentErrorString(QQmlComponent_ *component);
+ QObject_ *componentCreate(QQmlComponent_ *component, QQmlContext_ *context);
+ QQuickWindow_ *componentCreateWindow(QQmlComponent_ *component, QQmlContext_ *context);
++QQuickWindow_ *sailfishCreateWindow();
+ 
+ void windowShow(QQuickWindow_ *win);
++void sailfishwindowShow();
+ void windowHide(QQuickWindow_ *win);
+ uintptr_t windowPlatformId(QQuickWindow_ *win);
+ void windowConnectHidden(QQuickWindow_ *win);
++void windowConnectDestroy(QQuickWindow_ *win);
+ QObject_ *windowRootObject(QQuickWindow_ *win);
+ QImage_ *windowGrabWindow(QQuickWindow_ *win);
+ 
+diff --git a/qml.go b/qml.go
+index 565a361..d906bd2 100644
+--- a/qml.go
++++ b/qml.go
+@@ -33,6 +33,22 @@ type Engine struct {
+ }
+ 
+ var engines = make(map[unsafe.Pointer]*Engine)
++// NewSailfishEngine returns a new Sailfish QML engine.
++//
++// The Destory method must be called to finalize the engine and
++// release any resources used.
++func SailfishNewEngine() *Engine {
++	engine := &Engine{values: make(map[interface{}]*valueFold)}
++	RunMain(func() {
++		engine.addr = C.newSailfishEngine()
++		engine.engine = engine
++		engine.imageProviders = make(map[string]*func(imageId string, width, height int) image.Image)
++		engines[engine.addr] = engine
++		stats.enginesAlive(+1)
++	})
++	return engine
++}
++
+ 
+ // NewEngine returns a new QML engine.
+ //
+@@ -144,6 +160,16 @@ func (e *Engine) Load(location string, r io.Reader) (Object, error) {
+ 	return comp, nil
+ }
+ 
++// Set the Sailfish applications view source to the given QML file from the applications
++// root shared folder.
++func (e *Engine) SailfishSetSource(path string) (Object, error) {
++	cloc, cloclen := unsafeStringData(path)
++	RunMain(func() {
++		C.sailfishSetSource(cloc, cloclen)
++	})
++	return &Common{engine: e}, nil
++}
++
+ // LoadFile loads a component from the provided QML file.
+ // Resources referenced by the QML content will be resolved relative to its path.
+ //
+@@ -241,6 +267,14 @@ func (e *Engine) AddImageProvider(prvId string, f func(imgId string, width, heig
+ 		C.engineAddImageProvider(e.addr, qprvId, unsafe.Pointer(&f))
+ 	})
+ }
++func (e *Engine) Translator(translatorRoot string) {
++	ctranslatorRoot, ctranslatorLen := unsafeStringData(translatorRoot)
++	RunMain(func() {
++		qtranslatorRoot := C.newString(ctranslatorRoot, ctranslatorLen)
++		defer C.delString(qtranslatorRoot)
++		C.newTranslator(qtranslatorRoot)
++	})
++}
+ 
+ //export hookRequestImage
+ func hookRequestImage(imageFunc unsafe.Pointer, cid *C.char, cidLen, cwidth, cheight C.int) unsafe.Pointer {
+@@ -369,6 +403,7 @@ type Object interface {
+ 	Call(method string, params ...interface{}) interface{}
+ 	Create(ctx *Context) Object
+ 	CreateWindow(ctx *Context) *Window
++	SailfishCreateWindow() *Window
+ 	Destroy()
+ 	On(signal string, function interface{})
+ }
+@@ -731,6 +766,26 @@ func (obj *Common) Create(ctx *Context) Object {
+ 	return &root
+ }
+ 
++// Returns the root object after Sailfish view had been created
++func (e *Engine) SailfishGetWindowRoot() *Common {
++	var obj Common
++	obj.engine = e.engine
++	RunMain(func() {
++		obj.addr = C.windowRootObject(C.sailfishCreateWindow())
++	})
++	return &obj
++}
++
++// Returns a window structure for Sailfish application QQuickView
++func (obj *Common) SailfishCreateWindow() *Window {
++	var win Window
++	win.engine = obj.engine
++	RunMain(func() {
++		win.addr = C.sailfishCreateWindow()
++	})
++	return &win
++}
++
+ // CreateWindow creates a new instance of the component held by obj,
+ // and creates a new window holding the instance as its root object.
+ // The component instance runs under the ctx context. If ctx is nil,
+@@ -874,6 +929,13 @@ type Window struct {
+ 	Common
+ }
+ 
++// Show exposes the Sailfish application window.
++func (win *Window) SailfishShow() {
++	RunMain(func() {
++		C.sailfishwindowShow()
++	})
++}
++
+ // Show exposes the window.
+ func (win *Window) Show() {
+ 	RunMain(func() {
+@@ -921,6 +983,8 @@ func (win *Window) Wait() {
+ 		// TODO Must be able to wait for the same Window from multiple goroutines.
+ 		// TODO If the window is not visible, must return immediately.
+ 		waitingWindows[win.addr] = &m
+++		// BUG: Exiting on window hidden will fail on SailfishOS when cover image is shown app will exit
+++		// Solved this by implementing closeEvent filter for QWindows
+ 		C.windowConnectHidden(win.addr)
+ 	})
+ 	m.Lock()
