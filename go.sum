@@ -1,6 +1,0 @@
-github.com/masterzen/xmlpath v0.0.0-20140218185901-13f4951698ad h1:x50MyJNOPLsHR1euYRIaBx3Z2wlE0UPfZOHSYD+Flo0=
-github.com/masterzen/xmlpath v0.0.0-20140218185901-13f4951698ad/go.mod h1:A0zPC53iKKKcXYxr4ROjpQRQ5FgJXtelNdSmHHuq/tY=
-github.com/neclepsio/qml v0.0.0-20190227130933-4d1f36bcccd2 h1:R5VHjd5FdCvq7LL8IhNx9xwjj3NpGcRWj03+53nuoKM=
-github.com/neclepsio/qml v0.0.0-20190227130933-4d1f36bcccd2/go.mod h1:mdAHzFHUEkvoYy13gU8vSbCvrHRpVW1Xq9nKunawOxo=
-golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a h1:dGzPydgVsqGcTRVwiLJ1jVbufYwmzD3LfVPLKsKg+0k=
-golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
