@@ -50,6 +50,7 @@ typedef enum {
     DTFloat64 = 17,
     DTFloat32 = 18,
     DTColor   = 19,
+    DTDateTime = 20,
 
     DTGoAddr       = 100,
     DTObject       = 101,
@@ -107,10 +108,13 @@ typedef struct {
 } LogMessage;
 
 void newGuiApplication();
+void sailfishnewGuiApplication();
 void applicationExec();
+void sailfishapplicationExec();
 void applicationExit();
+void sailfishapplicationExit();
 void applicationFlushAll();
-void setWindowIcon(QString_ *path);
+void sailfishapplicationFlushAll();
 
 void idleTimerInit(int32_t *guiIdleRun);
 void idleTimerStart();
@@ -118,7 +122,9 @@ void idleTimerStart();
 void *currentThread();
 void *appThread();
 
+void newTranslator(QString_ *translatorRoot);
 QQmlEngine_ *newEngine(QObject_ *parent);
+QQmlEngine_ *newSailfishEngine();
 QQmlContext_ *engineRootContext(QQmlEngine_ *engine);
 void engineSetOwnershipCPP(QQmlEngine_ *engine, QObject_ *object);
 void engineSetOwnershipJS(QQmlEngine_ *engine, QObject_ *object);
@@ -153,15 +159,19 @@ error *objectGoRef(QObject_ *object, GoRef *ref);
 
 QQmlComponent_ *newComponent(QQmlEngine_ *engine, QObject_ *parent);
 void componentLoadURL(QQmlComponent_ *component, const char *url, int urlLen);
+void sailfishSetSource(const char *url, int urlLen);
 void componentSetData(QQmlComponent_ *component, const char *data, int dataLen, const char *url, int urlLen);
 char *componentErrorString(QQmlComponent_ *component);
 QObject_ *componentCreate(QQmlComponent_ *component, QQmlContext_ *context);
 QQuickWindow_ *componentCreateWindow(QQmlComponent_ *component, QQmlContext_ *context);
+QQuickWindow_ *sailfishCreateWindow();
 
 void windowShow(QQuickWindow_ *win);
+void sailfishwindowShow();
 void windowHide(QQuickWindow_ *win);
 uintptr_t windowPlatformId(QQuickWindow_ *win);
 void windowConnectHidden(QQuickWindow_ *win);
+void windowConnectDestroy(QQuickWindow_ *win);
 QObject_ *windowRootObject(QQuickWindow_ *win);
 QImage_ *windowGrabWindow(QQuickWindow_ *win);
 

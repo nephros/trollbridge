@@ -10,6 +10,7 @@ import (
 	"image/color"
 	"reflect"
 	"strings"
+	"time"
 	"unicode"
 	"unsafe"
 )
@@ -37,6 +38,7 @@ var (
 	typePainter    = reflect.TypeOf(&Painter{})
 	typeList       = reflect.TypeOf(&List{})
 	typeMap        = reflect.TypeOf(&Map{})
+	typeDateTime   = reflect.TypeOf(&time.Time{})
 	typeGenericMap = reflect.TypeOf(map[string]interface{}(nil))
 )
 
@@ -108,6 +110,9 @@ func packDataValue(value interface{}, dvalue *C.DataValue, engine *Engine, owner
 	case color.RGBA:
 		dvalue.dataType = C.DTColor
 		*(*uint32)(datap) = uint32(value.A)<<24 | uint32(value.R)<<16 | uint32(value.G)<<8 | uint32(value.B)
+	case time.Time:
+		dvalue.dataType = C.DTDateTime
+		*(*uint32)(datap) = uint32(value.Unix())
 	default:
 		dvalue.dataType = C.DTObject
 		if obj, ok := value.(Object); ok {
@@ -152,6 +157,9 @@ func unpackDataValue(dvalue *C.DataValue, engine *Engine) interface{} {
 	case C.DTColor:
 		var c uint32 = *(*uint32)(datap)
 		return color.RGBA{byte(c >> 16), byte(c >> 8), byte(c), byte(c >> 24)}
+	case C.DTDateTime:
+		var d int64 = int64(*(*uint32)(datap))
+		return time.Unix(d, 0)
 	case C.DTGoAddr:
 		// ObjectByName also does this fold conversion, to have access
 		// to the cvalue. Perhaps the fold should be returned.
@@ -221,6 +229,8 @@ func dataTypeOf(typ reflect.Type) C.DataType {
 		return C.DTAny
 	case typeRGBA:
 		return C.DTColor
+	case typeDateTime:
+		return C.DTDateTime
 	case typeObjSlice:
 		return C.DTListProperty
 	}

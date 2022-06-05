@@ -33,6 +33,22 @@ type Engine struct {
 
 var engines = make(map[unsafe.Pointer]*Engine)
 
+// NewSailfishEngine returns a new Sailfish QML engine.
+//
+// The Destory method must be called to finalize the engine and
+// release any resources used.
+func SailfishNewEngine() *Engine {
+	engine := &Engine{values: make(map[interface{}]*valueFold)}
+	RunMain(func() {
+		engine.addr = C.newSailfishEngine()
+		engine.engine = engine
+		engine.imageProviders = make(map[string]*func(imageId string, width, height int) image.Image)
+		engines[engine.addr] = engine
+		stats.enginesAlive(+1)
+	})
+	return engine
+}
+
 // NewEngine returns a new QML engine.
 //
 // The Destory method must be called to finalize the engine and
@@ -124,7 +140,7 @@ func (e *Engine) Load(location string, r io.Reader) (Object, error) {
 	cloc, cloclen := unsafeStringData(location)
 	comp := &Common{engine: e}
 	RunMain(func() {
-		// TODO The component's parent should probably be the engine.
+		//TODO The component's parent should probably be the engine.
 		comp.addr = C.newComponent(e.addr, nilPtr)
 		if qrc {
 			C.componentLoadURL(comp.addr, cloc, cloclen)
@@ -141,6 +157,16 @@ func (e *Engine) Load(location string, r io.Reader) (Object, error) {
 		return nil, err
 	}
 	return comp, nil
+}
+
+// Set the Sailfish applications view source to the given QML file from the applications
+// root shared folder.
+func (e *Engine) SailfishSetSource(path string) (Object, error) {
+	cloc, cloclen := unsafeStringData(path)
+	RunMain(func() {
+		C.sailfishSetSource(cloc, cloclen)
+	})
+	return &Common{engine: e}, nil
 }
 
 // LoadFile loads a component from the provided QML file.
@@ -238,6 +264,15 @@ func (e *Engine) AddImageProvider(prvId string, f func(imgId string, width, heig
 		qprvId := C.newString(cprvId, cprvIdLen)
 		defer C.delString(qprvId)
 		C.engineAddImageProvider(e.addr, qprvId, unsafe.Pointer(&f))
+	})
+}
+
+func (e *Engine) Translator(translatorRoot string) {
+	ctranslatorRoot, ctranslatorLen := unsafeStringData(translatorRoot)
+	RunMain(func() {
+		qtranslatorRoot := C.newString(ctranslatorRoot, ctranslatorLen)
+		defer C.delString(qtranslatorRoot)
+		C.newTranslator(qtranslatorRoot)
 	})
 }
 
@@ -368,6 +403,7 @@ type Object interface {
 	Call(method string, params ...interface{}) interface{}
 	Create(ctx *Context) Object
 	CreateWindow(ctx *Context) *Window
+	SailfishCreateWindow() *Window
 	Destroy()
 	On(signal string, function interface{})
 }
@@ -730,6 +766,26 @@ func (obj *Common) Create(ctx *Context) Object {
 	return &root
 }
 
+// Returns the root object after Sailfish view had been created
+func (e *Engine) SailfishGetWindowRoot() *Common {
+	var obj Common
+	obj.engine = e.engine
+	RunMain(func() {
+		obj.addr = C.windowRootObject(C.sailfishCreateWindow())
+	})
+	return &obj
+}
+
+// Returns a window structure for Sailfish application QQuickView
+func (obj *Common) SailfishCreateWindow() *Window {
+	var win Window
+	win.engine = obj.engine
+	RunMain(func() {
+		win.addr = C.sailfishCreateWindow()
+	})
+	return &win
+}
+
 // CreateWindow creates a new instance of the component held by obj,
 // and creates a new window holding the instance as its root object.
 // The component instance runs under the ctx context. If ctx is nil,
@@ -867,6 +923,13 @@ type Window struct {
 	Common
 }
 
+// Show exposes the Sailfish application window.
+func (win *Window) SailfishShow() {
+	RunMain(func() {
+		C.sailfishwindowShow()
+	})
+}
+
 // Show exposes the window.
 func (win *Window) Show() {
 	RunMain(func() {
@@ -911,9 +974,11 @@ func (win *Window) Wait() {
 	var m sync.Mutex
 	m.Lock()
 	RunMain(func() {
-		// TODO Must be able to wait for the same Window from multiple goroutines.
+		// TODO  Must be able to wait for the same Window from multiple goroutines.
 		// TODO If the window is not visible, must return immediately.
 		waitingWindows[win.addr] = &m
+		// BUG: Exiting on window hidden will fail on SailfishOS when cover image is shown app will exit
+		// Solved this by implementing closeEvent filter for QWindows
 		C.windowConnectHidden(win.addr)
 	})
 	m.Lock()

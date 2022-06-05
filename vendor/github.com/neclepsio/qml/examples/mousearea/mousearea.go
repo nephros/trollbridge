@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/neclepsio/qml"
-	"gopkg.in/qml.v1"
 )
 
 const test_qml = `
