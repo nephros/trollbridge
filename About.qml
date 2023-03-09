@@ -32,7 +32,9 @@ Page {
 				The name of the application was chosen in memory of Terry Pratchett,<br>\
 				who died on March 12th, 2015.<br>\
 				This application has been build using GO language and QML bindings.<br>\
-				(C)2016 Bundyo, released under the MIT license.")
+				(C)2016 Bundyo, released under the MIT license.<br>\
+				Rewritten to replace GO with plain JavaScript by nephros<br>\
+				(C)2023 nephros, released under the MIT license.")
 				anchors.horizontalCenter: parent.horizontalCenter
 				wrapMode: Text.WrapAtWordBoundaryOrAnywhere
 				width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
