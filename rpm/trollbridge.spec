@@ -14,6 +14,7 @@ BuildRequires:  desktop-file-utils
 
 %description
 TRaveller's OLympus Bridge is an app for controlling Olympus OM-D/PEN/Air cameras with integrated WiFi.
+
 %if "%{?vendor}" == "chum"
 PackageName: Troll Bridge
 Type: desktop-application
@@ -42,12 +43,11 @@ Url:
 
 %prep
 
-%
+%build
 %qmake5 
 
 make %{?_smp_mflags}
 
-build
 
 %install
 rm -rf %{buildroot}
