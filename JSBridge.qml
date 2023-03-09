@@ -1,20 +1,27 @@
 import QtQuick 2.1
 
 QtObject {
-    property var config: {
-        downloadPath: "" 
-    }
 
-    property string model: "unknown"
-    property bool connected: true
+    // my properties:
+    property bool err: false
+    property var errMsg: ["",]
+
+    // properties from trollbridge:
+    property ListModel photoModel: ListModel{}
+
+    property var _list: [{}] // "ctrl.list"
+
+    property string downloadPath: "" 
+
+    property string model
+    property bool connected:( Qt.application.name ===  "QtQmlViewer" ) ? true : false
     property bool downloading: false
-    property bool opc
-    readonly property string version: Qt.application.version
+    property bool opc: false
+    function runtimeVersion(){ return "QtQuick 2.1" }
+    function version() { return Qt.application.version }
+
     function switchState(b_what){}
 
-    // worker functions:
-	//function CameraGetValue("get_caminfo", "/caminfo/model")
-	function cameraGetValue(cmd, path){}
 	//ctrl.CameraExecute("exec_pwon", "")
 	//ctrl.CameraExecute("exec_pwoff", "")
 	function cameraExecute(cmd, path){}
@@ -33,13 +40,31 @@ QtObject {
     function clearAllSelection() {}
     // Download Downloads the file at index
     //func (ctrl *BridgeControl) Download(idx int, quarterSize bool) {
-    function download(idx , quarterSize) {}
+    function download(idx , quarterSize) {
+	    cameraDownloadFile(_list[idx].path, _list[idx].file, quarterSize)
+    }
     // DownloadSelected Downloads all selected files
     //func (ctrl *BridgeControl) DownloadSelected(quarterSize bool) {
-    function downloadSelected(quarterSize) {}
+    function downloadSelected(quarterSize) {
+        downloading = true
+        for (var i = 0; i < _list.length; i++) {
+            if (o[i].selected) {
+                o[i].downloading = true
+                updateItem(i)
+            }
+        }
+        for (var i = 0; i < _list.length; i++) {
+            if (o[i].selected) {
+                o[i].downloading = true
+                download(i, quarterSize)
+            }
+        }
+        downloading = false
+    }
     // UpdateItem Downloads the file at index
     //func (ctrl *BridgeControl) UpdateItem(idx int) {
-    function updateItem(idx) {}
+    function updateItem(idx) {
+    }
     // SwitchMode Switch the camera mode to rec/play/shutter
     //func (ctrl *BridgeControl) SwitchMode(mode string) {
     function switchMode(mode) {
@@ -75,6 +100,22 @@ QtObject {
 			cameraExecute("exec_shutter", "com=1strelease")
 		}
 	}
+    // Connect Connects to the Camera
+    //func (ctrl *BridgeControl) Connect() {
+    function connect() {
+		model = cameraGetValue("get_caminfo", "/caminfo/model")
+		const cameraType = cameraGetValue("get_connectmode", "/connectmode")
+		if (cameraType === "OPC") {
+			cameraExecute("switch_commpath", "path=wifi")
+			opc = true
+
+			if (connected && !err) { switchMode("standalone") }
+						
+			if (model === "") {
+				model = cameraGetValue("get_caminfo", "/caminfo/model")
+			}
+		}
+    }
 
     // SetModel BridgeControl Model setter 
     //func (ctrl *BridgeControl) SetModel(model string) {
@@ -90,24 +131,30 @@ QtObject {
     }
     // CameraGetValue Get a value from camera
     //func (ctrl *BridgeControl) CameraGetValue(query string, path string, params ...string) (string, error) {
-    function cameraGetValue(query , path , params) {}
+    function cameraGetValue(query , xpath , params) {
+	    return fireQuery("", query, params )
+    }
 
     // CameraGetFolder Get file list from camera
     //func (ctrl *BridgeControl) CameraGetFolder(path string) error {
-    function cameraGetFolder(path) {}
+    function cameraGetFolder(path) {
+	    const res = fireQuery("", "get_imglist", [ "DIR=" + path, ])
+    }
     // CameraGetFile Gets a file from camera
     //func (ctrl *BridgeControl) CameraGetFile(file string) (image.Image, error) {
     function cameraGetFile(file ){
-        fireQuery("", "get_thumbnail", ["DIR=" + file] )
+        fireQuery("", "get_thumbnail", "DIR=" + file )
     }
     // CameraDownloadFile Download a file from the camera
     //func (ctrl *BridgeControl) CameraDownloadFile(path string, file string, quarterSize bool) int64 { 
     //	downloadPath := config.DownloadPath + "/" + ctrl.Model
     function cameraDownloadFile(path , file , quarterSize) { 
-        const	downloadPath = config.DownloadPath + "/" + model
+        const dlPath = downloadPath + "/" + model
         if (quarterSize) {
-           fireQuery("", "get_resizeimg", [ "DIR=" + path + "/" + file, "size=2048"]) {
+           const parms = [ "DIR=" + path + "/" + file, "size=2048"]
+           fireQuery("", "get_resizeimg", parms)
         } else {
+           const parms = [ path + "/" + file ]
            fireQuery("file", path + "/" + file)
         }
     }
