@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import Sailfish.Silica.Background 1.0
 
 Page {
     id: imageList
@@ -13,6 +14,8 @@ Page {
         }
     }
     
+    background: ColorBackground { color: "black" }
+
     ListModel {
         id: photoModel
         objectName: "photoModel"
