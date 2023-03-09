@@ -1,22 +1,31 @@
 import QtQuick 2.1
+import Sailfish.Silica 1.0
+import Sailfish.Share 1.0
+import Nemo.FileManager 1.0
 
-QtObject {
+QtObject { id: control
 
+    Component.onCompleted: connect()
     // my properties:
+    property var config: {
+        "host": "192.168.0.10",
+        "hostaddr": "http://192.168.0.10/",
+        "agent": "OlympusCameraKit",
+    }
     property bool err: false
     property var errMsg: ["",]
-
     // properties from trollbridge:
-    property ListModel photoModel: ListModel{}
+    //property ListModel photoModel: ListModel{}
 
-    property var _list: [{}] // "ctrl.list"
-
-    property string downloadPath: "" 
-
+    //property ListElement elemProto: ListElement { property var file: {} }
+    property ListModel _list: ListModel {}
+    //property string downloadPath: Sailfish.Silica.StandardPaths.pictures
+    property string downloadPath: StandardPaths.pictures
     property string model
-    property bool connected:( Qt.application.name ===  "QtQmlViewer" ) ? true : false
+    property string type
+    property bool connected: false //( Qt.application.name ===  "QtQmlViewer" ) ? true : false
     property bool downloading: false
-    property bool opc: false
+    property bool opc: (type === "OPC")
     function runtimeVersion(){ return "QtQuick 2.1" }
     function version() { return Qt.application.version }
 
@@ -24,7 +33,7 @@ QtObject {
 
 	//ctrl.CameraExecute("exec_pwon", "")
 	//ctrl.CameraExecute("exec_pwoff", "")
-	function cameraExecute(cmd, path){}
+	function cameraExecute(cmd, path){console.debug("called.")}
    
     // GetImage Get image at list index
     //func (ctrl *BridgeControl) GetImage(index int) *File {
@@ -103,25 +112,27 @@ QtObject {
     // Connect Connects to the Camera
     //func (ctrl *BridgeControl) Connect() {
     function connect() {
-		model = cameraGetValue("get_caminfo", "/caminfo/model")
-		const cameraType = cameraGetValue("get_connectmode", "/connectmode")
-		if (cameraType === "OPC") {
+		cameraGetValue("get_caminfo", "/caminfo/model", [], function(m) { setModel(m)} )
+		cameraGetValue("get_connectmode", "/connectmode", [], function(t) {setCameraType(t)})
+		if (type === "OPC") {
 			cameraExecute("switch_commpath", "path=wifi")
-			opc = true
-
 			if (connected && !err) { switchMode("standalone") }
-						
-			if (model === "") {
-				model = cameraGetValue("get_caminfo", "/caminfo/model")
-			}
+			if (model === "") { cameraGetValue("get_caminfo", "/caminfo/model") }
 		}
+        connected = true
     }
 
     // SetModel BridgeControl Model setter 
     //func (ctrl *BridgeControl) SetModel(model string) {
     function setModel(m) {
-        model = m
-        console.log("changed: " + model)
+        const re = /<model>([^<]+)<\/model>/
+        model = m.match(re)[1]
+        console.log(model)
+    }
+    function setCameraType(t) {
+        const re = /<connectmode>([^<]+)<\/connectmode>/
+        type = t.match(re)[1]
+        console.log(type)
         //TODO: should change "connected" 
     }
     // GetFileList Check for files
@@ -131,14 +142,15 @@ QtObject {
     }
     // CameraGetValue Get a value from camera
     //func (ctrl *BridgeControl) CameraGetValue(query string, path string, params ...string) (string, error) {
-    function cameraGetValue(query , xpath , params) {
-	    return fireQuery("", query, params )
+    function cameraGetValue(query , xpath , params, cb ) {
+	    fireQuery("", query, params, cb )
     }
 
     // CameraGetFolder Get file list from camera
     //func (ctrl *BridgeControl) CameraGetFolder(path string) error {
     function cameraGetFolder(path) {
-	    const res = fireQuery("", "get_imglist", [ "DIR=" + path, ])
+	    fireQuery("", "get_imglist", [ "DIR=" + path, ], function(d) { handleImgList(d) } )
+        console.debug("done.")
     }
     // CameraGetFile Gets a file from camera
     //func (ctrl *BridgeControl) CameraGetFile(file string) (image.Image, error) {
@@ -159,56 +171,101 @@ QtObject {
         }
     }
 
-    function fireQuery(requestType , query , params){
+    function fireQuery(requestType , query , params, callback){
+       console.debug("firequery: r", requestType,"q" , query, "p", params.join(" "), "cb", callback)
 
-        const addr = "http://192.168.0.10/" 
-        const paramString = ""
-        if (params.length > 0) {
-            paramString = "?" + params.join("&")
-        }
-
-        // TODO
-        // Shorten the delay for camera detection
-        //if query == "get_caminfo" {
-        //	client = &http.Client{
-        //		Timeout: time.Duration(2 * time.Second),
-        //	}
-        //} else {
-        //	client = &http.Client{}
+        //if (!callback || callback === null || typeof(callback) === undefined) {
+        //    function callback() {console.debug("default callback")};
         //}
 
-        if (!requestType || requestType === "") requestType = "GET"
 
-        const xhr
+        if (!requestType || requestType === "") requestType = "GET"
+        const paramString = (params.length > 0) ? "?" + params.join("&") : ""
+
+        const xhr = new  XMLHttpRequest()
         if (requestType === "file") {
-            xhr =new  XMLHttpRequest()
-            xhr.open("GET", "http://192.168.0.10/" + query + paramString)
+            xhr.open("GET", config.hostaddr + query + paramString)
         } else {
-            xhr = new XMLHttpRequest()
-            xhr.open(requestType, "http://192.168.0.10/" + query + ".cgi" + paramString)
+            xhr.open(requestType, config.hostaddr + query + ".cgi" + paramString)
         }
-        req.setRequestHeader("User-Agent", "OlympusCameraKit")
-        req.setRequestHeader("Host", "192.168.0.10")
-        req.send()
-        r.onreadystatechange = function(event) {
-            if (r.readyState == XMLHttpRequest.DONE) {
-                if (partial && r.status === 206) {
-                    var rdata = JSON.parse(r.response);
+        xhr.setRequestHeader("User-Agent", config.agent)
+        xhr.setRequestHeader("Host", config.host)
+        xhr.send()
+        xhr.onreadystatechange = function(event) {
+            if (xhr.readyState == XMLHttpRequest.DONE) {
+                console.debug("REQ: done,", xhr.status)
+                if (xhr.status === 206) { // partial
+                    var rdata = xhr.response;
                     callback(rdata)
-                } else if (r.status === 200 || r.status == 0) {
-                    var rdata = JSON.parse(r.response);
+                } else if (xhr.status === 200 || xhr.status == 0) {
+                    var rdata = xhr.response;
+                    //console.debug("got:", rdata)
                     callback(rdata)
                 } else {
-                    console.debug("error in processing request.", query, r.status, r.statusText);
-                    obj.lastError = r.statusText;
+                    console.debug("error in processing request.", query, xhr.status, xhr.statusText);
+                    obj.lastError = xhr.statusText;
                 }
-            busy = false;
             }
         }
+    }
 
-        return res
+    function handleImgList(data) {
+        const d = data.split("\r\n")
+        if (!d[0] === "VER_100") { console.debug("Prefix not correct"); return }
+        d.forEach(function(line) {
+            if ((line === "") || (line === "VER_100")) return
+            // example line: /DCIM/100OLYMP,PA010242.JPG,7051179,0,21825,29424
+            //               path          ,filename    ,size   ,?,?????,?????
+            const rowData = line.split(",")
+            const fileType = rowData[1].split(".")[1]
+            //const f = rowData[1].substring(rowData[1].lastIndexOf("."))
+            const e = {}
+            e["index"]       = rowData[1].substring(4,8) + fileType
+            e["path"]        = rowData[0]
+            e["file"]        = rowData[1]
+			e["trollPath"]   = downloadPath + "/" + model + rowData[0] + "/" + rowData[1]
+            e["type"]        = fileType
+            e["size"]        = Number(rowData[2])
+            e["downloading"] = false
+            e["selected"  ]  = false
+            e["downloaded"]  = false
+            e["quarter"   ]  = false
+            //console.debug("appending", JSON.stringify(e))
+            _list.append(e);
+        })
+        console.debug("found", _list.count, "entries")
+    }
+
+    function xhrbin(url, name) {
+        if (token === "") return false;   // not without token!
+        var query = Qt.resolvedUrl(url);
+        var r = new XMLHttpRequest();
+        r.open('GET', query);
+        r.responseType = 'arraybuffer';
+        xhr.setRequestHeader("User-Agent", config.agent)
+        xhr.setRequestHeader("Host", config.host)
+
+        r.send();
+        r.onreadystatechange = function(event) {
+            if (r.readyState == XMLHttpRequest.DONE) {
+                if (r.status === 200 || r.status == 0) {
+                    console.debug("OK, data received.", r.status, r.statusText, r.getResponseHeader("mime-type"));
+                    var tmp = ShareAction.writeContentToFile(
+                        { "name": name, "type": r.getResponseHeader("mime-type"), "data": r.response }
+                    )
+                    console.debug("OK, file written.", tmp);
+                    FileEngine.rename(tmp, downloadPath + "/" + name, true);
+                    lastDownloadedFile = downloadPath + "/" + name;
+                    console.debug("OK, file copied.", lastDownloadedFile);
+                } else {
+                    console.debug("error in processing request.", r.status, r.statusText);
+                    obj.lastError = r.statusText;
+                }
+            }
+        }
     }
 
 }
 
 // vim: ft=javascript nu expandtab ts=4 sw=4 st=4
+
