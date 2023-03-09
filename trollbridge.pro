@@ -4,15 +4,18 @@ INCLUDEPATH += .
 
 lupdate_only {
 SOURCES += \
-    qml/$${TARGET}.qml \
-    qml/pages/*.qml \
-    qml/cover/*.qml \
-    qml/components/*.qml
-
+	About.qml\
+	Cover.qml\
+	ImageList.qml\
+	JSBridge.qml\
+	Shutter.qml\
+	TrollBridge.qml\
+	main.qml
 }
 
 
-TRANSLATIONS += i18n/base.ts i18n/qml_de.ts
+TRANSLATIONS += translations/$${TARGET}-en.ts \
+                translations/$${TARGET}-de.ts \
 
 desktop.files = $${TARGET}.desktop
 desktop.path = $$PREFIX/share/applications
@@ -24,3 +27,4 @@ INSTALLS += qml
 
 OTHER_FILES += $$files(rpm/*)
 
+include(translations/translations.pri)
