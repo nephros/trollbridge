@@ -2,7 +2,12 @@
 Encoding=UTF-8
 Version=1.0
 Type=Application
-X-Nemo-Application-Type=generic
+X-Nemo-Application-Type=silica-qt5
 Name=Troll Bridge
 Icon=harbour-trollbridge
-Exec=harbour-trollbridge
+Exec=sailfish-qml harbour-trollbridge
+
+[X-Sailjail]
+ApplicationName=TrollBridge
+OrganizationName=org.nephros.sailfish
+Permissions=Downloads;Pictures;MediaIndexing;Internet
