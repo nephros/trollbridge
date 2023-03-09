@@ -5,7 +5,7 @@ import Sailfish.Silica.Background 1.0
 Page {
     id: imageList
     property string mode: ""
-    
+
     onStatusChanged: {
         if (status == PageStatus.Deactivating && _navigation == PageNavigation.Back) {
             if (bridge.opc) {
@@ -13,20 +13,20 @@ Page {
             }
         }
     }
-    
+
     background: ColorBackground { color: "black" }
 
     ListModel {
         id: photoModel
         objectName: "photoModel"
-        
+
         property var addItem: null
         onAddItemChanged: { 
             if (addItem !== null) {
                 this.append(addItem);
             }
         }
-        
+
         property var item: null
         property var setIndex: null
         onSetIndexChanged: {
@@ -37,7 +37,7 @@ Page {
                 setIndex = null;
             }
         }
-        
+
         function findInModel(idx) {
             for (var i = 0, len = photoModel.count; i < len; i++) {
                 if (photoModel.get(i).index === idx) {
@@ -46,7 +46,7 @@ Page {
             }
         }
     }
-    
+
     SilicaGridView {
         id: thumbGridView
 
@@ -55,17 +55,17 @@ Page {
         cellHeight: cellWidth
         model: photoModel
         height: parent.height
-        
+
         PullDownMenu {
             id: pdMain
-            
+
             property string action: "" 
             property var subAction: null
             enabled: !bridge.downloading
-            
+
             MenuItem {
                 id: pullDownDeleteShow
-                
+
                 visible: false
                 text: qsTr("Select and DELETE!")
                 onClicked: {
@@ -75,13 +75,13 @@ Page {
 
             MenuItem {
                 id: pullDownDownloadShow
-                
+
                 text: qsTr("Select and Download")
                 onClicked: {
                     pdMain.action = "pullDownDownload";
                 }
             }
-            
+
             MenuItem {
                 id: pullDownDelete
                 visible: false
@@ -118,7 +118,7 @@ Page {
                     } 
                 }
             }
-            
+
             onActiveChanged: {
                 if (active === false && pdMain.action !== "") {
                     //pullDownDeleteShow.visible = pdMain.action === "main";
@@ -128,7 +128,7 @@ Page {
                     pullDownDownloadHalf.visible = pdMain.action === "pullDownDownload";
                     imageList.mode = pdMain.action === "main" ? "" : pdMain.action.replace("pullDown", "");
                     pdMain.action = "";
-                    
+
                     if (pdMain.subAction) {
                         pdMain.subAction();
                         thumbGridView.forceLayout();
@@ -139,40 +139,40 @@ Page {
 
         header: Column {
             id: customHeader
-        
+
             width: ( parent.width - ( 2.0 * Theme.paddingLarge ))
             height: 110
             spacing: 0
             x: Theme.paddingLarge
-            
+
             // Aargh!
             Rectangle { height: Theme.paddingMedium; width: parent.width; color: "transparent" }
-        
+
             Label {
                 id: firstHeader
                 width: parent.width
                 height: Theme.fontSizeExtraLarge
-        
+
                 text: (imageList.mode !== "" ? imageList.mode : "Images")
                 font.pixelSize: Theme.fontSizeLarge
                 color: Theme.highlightColor
                 horizontalAlignment: Text.AlignRight
             }
-        
+
             Label {
                 id: subHeader
                 width: parent.width
-        
+
                 text: (imageList.mode !== "" ? "from " : "on ") + bridge.model
                 font.pixelSize: Theme.fontSizeMedium
                 color: Theme.secondaryHighlightColor
                 horizontalAlignment: Text.AlignRight
             }
         }
-        
+
         delegate: Item {
             id: thumbDelegate
-            
+
             width: parent.width / Math.round(parent.width / 200)
             height: width
 
@@ -193,20 +193,20 @@ Page {
 
                 Component { 
                     id: thumbBusy 
-                    
+
                     BusyIndicator { 
                         running: true 
                         visible: !downloading
                     } 
                 }
-                
+
                 Image {
                     width: parent.width - 4
                     height: width
                     anchors.centerIn: parent
                     visible: downloading
                     source: "image://theme/icon-m-sync"
-                    
+
                     RotationAnimation on rotation {
                         loops: Animation.Infinite
                         duration: 1000
@@ -215,7 +215,7 @@ Page {
                     }
                 }
             }
-            
+
             Rectangle {
                 id: checkboxDownload
                 width: 48
@@ -232,7 +232,7 @@ Page {
                     source: "image://theme/icon-lock-application-update"
                 }
             }
-            
+
             Rectangle {
                 id: checkboxDelete
                 width: 48
@@ -270,7 +270,7 @@ Page {
                     source: "image://theme/" + (quarter ? "icon-m-scale" : "icon-m-tabs") + "?#FFF"
                 }
             }
-            
+
             Rectangle {
                 id: checkboxType
                 width: 48
