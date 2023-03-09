@@ -7,5 +7,6 @@ ApplicationWindow {
 	initialPage: Component { TrollBridge { id: tbMain } }
 	allowedOrientations: Orientation.All
 	_defaultPageOrientations: Orientation.All
+	JSBridge{ id: bridge }
 }
 
