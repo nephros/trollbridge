@@ -5,25 +5,53 @@ Release:    1
 Group:      Applications/Multimedia
 License:    MIT
 #Source0: https://github.com/example/app/archive/v%{version}.tar.gz
-#Requires:   mapplauncherd-booster-silica-qt5
-#Requires:   nemo-qml-plugin-thumbnailer-qt5
-Requires:   sailfishsilica-qt5
-BuildRequires:  pkgconfig(sailfishapp)
-BuildRequires:  pkgconfig(Qt5Quick)
-BuildRequires:  pkgconfig(Qt5Qml)
-BuildRequires:  pkgconfig(Qt5Core)
-#BuildRequires:  pkgconfig(qdeclarative5-boostable)
+Requires:   libsailfishapp-launcher
+BuildRequires:  qt5-qttools-linguist
+BuildRequires:  qt5-qmake
+BuildRequires:  sailfish-svg2png
+BuildRequires:  qml-rpm-macros
 BuildRequires:  desktop-file-utils
 
 %description
 TRaveller's OLympus Bridge is an app for controlling Olympus OM-D/PEN/Air cameras with integrated WiFi.
+%if "%{?vendor}" == "chum"
+PackageName: Troll Bridge
+Type: desktop-application
+DeveloperName: Bundyo, nephros
+DeveloperLogin: nephros
+PackagerName: nephros
+Categories:
+ - Media
+Custom:
+  Repo: %{url}
+Icon: %{url}/master/icons/template.svg
+Screenshots:
+ - %{url}/raw/metadata/screenshots/screenshot1.png
+ - %{url}/raw/metadata/screenshots/screenshot2.png
+ - %{url}/raw/metadata/screenshots/screenshot3.png
+Url:
+  Homepage: %{url}
+  Help: %{url}/discussions
+  Bugtracker: %{url}/issues
+  Donations:
+    - https://noyb.eu/en/donations-other-support-options
+    - https://my.fsfe.org/donate
+    - https://supporters.eff.org/donate/join-4
+    - https://openrepos.net/donate
+%endif
 
 %prep
 
-%build
+%
+%qmake5 
+
+make %{?_smp_mflags}
+
+build
 
 %install
 rm -rf %{buildroot}
+#%%qmake5_install
 install -d %{buildroot}%{_bindir}
 install -p -m 0755 %(pwd)/%{name} %{buildroot}%{_bindir}/%{name}
 install -d %{buildroot}%{_datadir}/applications
