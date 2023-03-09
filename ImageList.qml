@@ -7,7 +7,7 @@ Page {
     
     onStatusChanged: {
         if (status == PageStatus.Deactivating && _navigation == PageNavigation.Back) {
-            if (bridge.OPC) {
+            if (bridge.opc) {
                 bridge.switchMode("standalone");
             }
         }
