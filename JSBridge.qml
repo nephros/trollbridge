@@ -12,6 +12,7 @@ QtObject { id: control
         "hostaddr": "http://192.168.0.10/",
         "agent": "OlympusCameraKit",
     }
+    property string cachePath: StandardPaths.cache
     property bool err: false
     property var errMsg: ["",]
     // properties from trollbridge:
@@ -154,14 +155,14 @@ QtObject { id: control
     }
     // CameraGetFile Gets a file from camera
     //func (ctrl *BridgeControl) CameraGetFile(file string) (image.Image, error) {
-    function cameraGetFile(file ){
-        fireQuery("", "get_thumbnail", "DIR=" + file )
+    function cameraGetFile(file){
+        fireQuery("", "get_thumbnail", [ "DIR=" + file] )
     }
     // CameraDownloadFile Download a file from the camera
     //func (ctrl *BridgeControl) CameraDownloadFile(path string, file string, quarterSize bool) int64 { 
     //	downloadPath := config.DownloadPath + "/" + ctrl.Model
     function cameraDownloadFile(path , file , quarterSize) { 
-        const dlPath = downloadPath + "/" + model
+        const dlPath = Qt.resolvedUrl(downloadPath + "/" + model)
         if (quarterSize) {
            const parms = [ "DIR=" + path + "/" + file, "size=2048"]
            fireQuery("", "get_resizeimg", parms)
@@ -223,20 +224,21 @@ QtObject { id: control
             e["index"]       = rowData[1].substring(4,8) + fileType
             e["path"]        = rowData[0]
             e["file"]        = rowData[1]
-			e["trollPath"]   = downloadPath + "/" + model + rowData[0] + "/" + rowData[1]
+			e["trollPath"]   = cachePath + "/" + model + rowData[0] + "/" + rowData[1]
             e["type"]        = fileType
             e["size"]        = Number(rowData[2])
             e["downloading"] = false
             e["selected"  ]  = false
             e["downloaded"]  = false
             e["quarter"   ]  = false
-            //console.debug("appending", JSON.stringify(e))
             _list.append(e);
+            // download thumbnails
+            xhrbin(config.hostaddr + "get_thumbnail.cgi?DIR=" + path + file, file, trollPath)
         })
         console.debug("found", _list.count, "entries")
     }
 
-    function xhrbin(url, name) {
+    function xhrbin(url, name, path) {
         if (token === "") return false;   // not without token!
         var query = Qt.resolvedUrl(url);
         var r = new XMLHttpRequest();
@@ -254,9 +256,8 @@ QtObject { id: control
                         { "name": name, "type": r.getResponseHeader("mime-type"), "data": r.response }
                     )
                     console.debug("OK, file written.", tmp);
-                    FileEngine.rename(tmp, downloadPath + "/" + name, true);
-                    lastDownloadedFile = downloadPath + "/" + name;
-                    console.debug("OK, file copied.", lastDownloadedFile);
+                    FileEngine.rename(tmp, path + "/" + name, true);
+                    console.debug("OK, file copied.");
                 } else {
                     console.debug("error in processing request.", r.status, r.statusText);
                     obj.lastError = r.statusText;
