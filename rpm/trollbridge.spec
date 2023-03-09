@@ -51,17 +51,9 @@ make %{?_smp_mflags}
 
 %install
 rm -rf %{buildroot}
-#%%qmake5_install
-install -d %{buildroot}%{_bindir}
-install -p -m 0755 %(pwd)/%{name} %{buildroot}%{_bindir}/%{name}
-install -d %{buildroot}%{_datadir}/applications
-install -d %{buildroot}%{_datadir}/%{name}/qml
-install -d %{buildroot}%{_datadir}/%{name}/qml/i18n
-install -m 0444 -t %{buildroot}%{_datadir}/%{name}/qml *.qml
-install -m 0444 -t %{buildroot}%{_datadir}/%{name}/qml/i18n i18n/*.qm
+%qmake5_install
 install -d %{buildroot}%{_datadir}/icons/hicolor/86x86/apps
 install -m 0444 -t %{buildroot}%{_datadir}/icons/hicolor/86x86/apps data/%{name}.png
-install -p %(pwd)/trollbridge.desktop %{buildroot}%{_datadir}/applications/%{name}.desktop
 
 desktop-file-install --delete-original       \
   --dir %{buildroot}%{_datadir}/applications             \
@@ -76,6 +68,10 @@ desktop-file-install --delete-original       \
 %{_bindir}
 
 %changelog
+
+* Fri Mar 10 2023 nephros 0.2.0
+- rewrite Go parts in JavaScript
+
 * Thu May 12 2016 version 0.1.2
 - Fix occasional refresh issues (selection not showing)
 - Add file type tags (JPG/ORF)
