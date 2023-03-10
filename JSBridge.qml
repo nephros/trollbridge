@@ -15,6 +15,7 @@ QtObject { id: control
     property string cachePath: StandardPaths.cache
     property bool err: false
     property var errMsg: ["",]
+    property ShareAction sac: ShareAction{}
     // properties from trollbridge:
     //property ListModel photoModel: ListModel{}
 
@@ -219,12 +220,13 @@ QtObject { id: control
             //               path          ,filename    ,size   ,?,?????,?????
             const rowData = line.split(",")
             const fileType = rowData[1].split(".")[1]
+            const trollPath  = cachePath + "/" + model + rowData[0] + "/" + rowData[1]
             //const f = rowData[1].substring(rowData[1].lastIndexOf("."))
             const e = {}
             e["index"]       = rowData[1].substring(4,8) + fileType
             e["path"]        = rowData[0]
             e["file"]        = rowData[1]
-			e["trollPath"]   = cachePath + "/" + model + rowData[0] + "/" + rowData[1]
+            e["trollPath"]   = trollPath
             e["type"]        = fileType
             e["size"]        = Number(rowData[2])
             e["downloading"] = false
@@ -233,31 +235,34 @@ QtObject { id: control
             e["quarter"   ]  = false
             _list.append(e);
             // download thumbnails
-            xhrbin(config.hostaddr + "get_thumbnail.cgi?DIR=" + path + file, file, trollPath)
+            if (FileEngine.exists(trollPath)) {
+            } else {
+                FileEngine.mkdir(cachePath + "/" + model + rowData[0], Qt.application.name, true);
+                xhrbin(config.hostaddr + "get_thumbnail.cgi?DIR=" + e["path"] + e["file"], e["file"], e["trollPath"])
+            }
         })
         console.debug("found", _list.count, "entries")
     }
 
     function xhrbin(url, name, path) {
-        if (token === "") return false;   // not without token!
         var query = Qt.resolvedUrl(url);
         var r = new XMLHttpRequest();
         r.open('GET', query);
         r.responseType = 'arraybuffer';
-        xhr.setRequestHeader("User-Agent", config.agent)
-        xhr.setRequestHeader("Host", config.host)
+        r.setRequestHeader("User-Agent", config.agent)
+        r.setRequestHeader("Host", config.host)
 
         r.send();
         r.onreadystatechange = function(event) {
             if (r.readyState == XMLHttpRequest.DONE) {
                 if (r.status === 200 || r.status == 0) {
                     console.debug("OK, data received.", r.status, r.statusText, r.getResponseHeader("mime-type"));
-                    var tmp = ShareAction.writeContentToFile(
+                    var tmp = sac.writeContentToFile(
                         { "name": name, "type": r.getResponseHeader("mime-type"), "data": r.response }
                     )
                     console.debug("OK, file written.", tmp);
                     FileEngine.rename(tmp, path + "/" + name, true);
-                    console.debug("OK, file copied.");
+                    console.debug("OK, file copied.", path + "/"+ name);
                 } else {
                     console.debug("error in processing request.", r.status, r.statusText);
                     obj.lastError = r.statusText;
