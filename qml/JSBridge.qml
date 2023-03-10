@@ -100,14 +100,20 @@ Item { id: control
     }
     // SetSelectionItem Set selection at list index
     //func (ctrl *BridgeControl) SetSelectionItem(idx int, value bool) {
-    function setSelectionItem(idx, value){console.debug("called.")}
+    function setSelectionItem(idx, value){console.debug("called.")
+            setSelection(idx, true)
+    }
     // ClearAllSelection Clears the file list selection
     //func (ctrl *BridgeControl) ClearAllSelection() {
-    function clearAllSelection(){console.debug("called.")}
+    function clearAllSelection(){console.debug("called.")
+        for (var i = 0; i < _list.length; i++) {
+            setSelection(i, false)
+        }
+    }
     // Download Downloads the file at index
     //func (ctrl *BridgeControl) Download(idx int, quarterSize bool) {
     function download(idx , quarterSize) {
-	    cameraDownloadFile(_list[idx].path, _list[idx].file, quarterSize)
+        cameraDownloadFile(_list.get(idx).path, _list.get(idx).file, quarterSize)
     }
     // DownloadSelected Downloads all selected files
     //func (ctrl *BridgeControl) DownloadSelected(quarterSize bool) {
@@ -129,7 +135,7 @@ Item { id: control
     }
     // UpdateItem Downloads the file at index
     //func (ctrl *BridgeControl) UpdateItem(idx int) {
-    function updateItem(idx) {
+    function updateItem(idx) {console.debug("called.")
     }
     // SwitchMode Switch the camera mode to rec/play/shutter
     //func (ctrl *BridgeControl) SwitchMode(mode string) {
@@ -231,11 +237,6 @@ Item { id: control
 
     function fireQuery(requestType , query , params, callback){
        console.debug("r", requestType,"q" , query, "p", params.join(" "), "cb", callback)
-
-        //if (!callback || callback === null || typeof(callback) === undefined) {
-        //    function callback() {console.debug("default callback")};
-        //}
-
 
         if (!requestType || requestType === "") requestType = "GET"
         const paramString = (params.length > 0) ? "?" + params.join("&") : ""
