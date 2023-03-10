@@ -261,11 +261,8 @@ Item { id: control
             const fileType = rowData[1].split(".")[1]
             const trollDir  = cachePath + "/" + model + rowData[0]
             const trollPath  = trollDir + "/" + rowData[1]
-        if (!FileEngine.exists(trollPath)) {
-            FileEngine.mkdir(trollDir, rowData[0], true)
-            FileEngine.mkdir(trollPath, "DCIM", true)
-            FileEngine.mkdir(trollPath + "/" + "DCIM", rowData[0].substring(rowData[0].lastIndexOf("/")), true)
-        }
+            // TODO: make only once!
+            mkdirpath(trollPath)
             //const f = rowData[1].substring(rowData[1].lastIndexOf("."))
             const e = {}
             // whats this for and why this value?
