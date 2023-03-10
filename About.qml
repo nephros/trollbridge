@@ -77,15 +77,15 @@ Page {
 				x: Theme.paddingLarge
 			}
 
-			Label {
-				text: qsTr("Compiled using GO Runtime %1<br>Application version %2").arg(bridge.runtimeVersion()).arg(bridge.version())
-				anchors.horizontalCenter: parent.horizontalCenter
-				wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-				width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
-				verticalAlignment: Text.AlignVCenter
-				horizontalAlignment: Text.AlignLeft
-				x: Theme.paddingLarge
-			}
+			//Label {
+			//	text: qsTr("Compiled using GO Runtime %1<br>Application version %2").arg(bridge.runtimeVersion()).arg(bridge.version())
+			//	anchors.horizontalCenter: parent.horizontalCenter
+			//	wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+			//	width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
+			//	verticalAlignment: Text.AlignVCenter
+			//	horizontalAlignment: Text.AlignLeft
+			//	x: Theme.paddingLarge
+			//}
 		}
 	}
 }
