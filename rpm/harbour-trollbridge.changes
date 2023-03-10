@@ -1,0 +1,17 @@
+* Fri Mar 10 2023 nephros 0.2.0
+- rewrite Go parts in JavaScript
+
+* Thu May 12 2016 version 0.1.2
+- Fix occasional refresh issues (selection not showing)
+- Add file type tags (JPG/ORF)
+- Add proper RAW download support (indexes were wrong)
+- Make download loader distinctive 
+
+* Mon May 09 2016 version 0.1.1
+- Add support for Olympus Air (image download only)
+- Fix folder creation bug
+
+* Sun May 01 2016 version 0.1
+- Add support for remote shutter
+- Add support for image download
+- Add support for remote power off

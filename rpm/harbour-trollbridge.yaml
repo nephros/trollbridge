@@ -1,0 +1,61 @@
+Name: harbour-trollbridge
+Summary: TRaveller's OLympus Bridge
+Version: 0.2.0
+Release: 1
+Group: Applications/Multimedia
+License: MIT
+Sources:
+    - "%{name}-%{version}.tar.gz"
+Description: |
+    TRaveller's OLympus Bridge is an app for controlling Olympus OM-D/PEN/Air cameras with integrated WiFi.
+    
+    %if "%{?vendor}" == "chum"
+    PackageName: Troll Bridge
+    Type: desktop-application
+    DeveloperName: Bundyo, nephros
+    DeveloperLogin: nephros
+    PackagerName: nephros
+    Categories:
+     - Media
+    Custom:
+      Repo: %{url}
+    Icon: %{url}/master/icons/svgs/%{name}.svg
+    Url:
+      Homepage: %{url}
+      Help: %{url}/discussions
+      Bugtracker: %{url}/issues
+      Donations:
+        - https://noyb.eu/en/donations-other-support-options
+        - https://my.fsfe.org/donate
+        - https://supporters.eff.org/donate/join-4
+        - https://openrepos.net/donate
+    %endif
+
+BuildArch: noarch
+Requires:
+    - libsailfishapp-launcher
+PkgBR:
+    - qt5-qttools-linguist
+    - qt5-qmake
+    - sailfish-svg2png
+    - qml-rpm-macros
+    - desktop-file-utils
+RpmLintIgnore:
+  - 'summary-too-long'
+  - 'no-changelogname-tag'
+  - 'invalid-url'
+  - 'desktopfile-without-binary'
+  - 'explicit-lib-dependency'
+Configure: none
+Builder: qmake5
+Builder: make
+NoIconCache: true
+Files:
+  - '%{_datadir}/applications/*.desktop' 
+  - '%dir %{_datadir}/%{name}' 
+  - '%{_datadir}/%{name}/qml/*' 
+  - '%{_datadir}/%{name}/translations/%{name}-*.qm' 
+  - '#%{_datadir}/icons/hicolor/*/apps/%{name}.png' 
+  - '%{_datadir}/icons/hicolor/*/apps/%{name}.svg' 
+
+
