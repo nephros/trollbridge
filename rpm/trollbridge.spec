@@ -4,7 +4,7 @@ Version:    0.2.0
 Release:    1
 Group:      Applications/Multimedia
 License:    MIT
-#Source0: https://github.com/example/app/archive/v%{version}.tar.gz
+Source:     %{name}-%{version}.tar.gz
 Requires:   libsailfishapp-launcher
 BuildRequires:  qt5-qttools-linguist
 BuildRequires:  qt5-qmake
@@ -39,6 +39,7 @@ Url:
 %endif
 
 %prep
+%setup -q -n %{name}-%{version}
 
 %build
 %qmake5 
