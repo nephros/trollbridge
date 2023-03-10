@@ -11,6 +11,7 @@ BuildRequires:  qt5-qmake
 BuildRequires:  sailfish-svg2png
 BuildRequires:  qml-rpm-macros
 BuildRequires:  desktop-file-utils
+BuildArch: noarch
 
 %description
 TRaveller's OLympus Bridge is an app for controlling Olympus OM-D/PEN/Air cameras with integrated WiFi.
@@ -25,11 +26,7 @@ Categories:
  - Media
 Custom:
   Repo: %{url}
-Icon: %{url}/master/icons/template.svg
-Screenshots:
- - %{url}/raw/metadata/screenshots/screenshot1.png
- - %{url}/raw/metadata/screenshots/screenshot2.png
- - %{url}/raw/metadata/screenshots/screenshot3.png
+Icon: %{url}/master/icons/svgs/%{name}.svg
 Url:
   Homepage: %{url}
   Help: %{url}/discussions
@@ -46,14 +43,12 @@ Url:
 %build
 %qmake5 
 
-make %{?_smp_mflags}
+#make %%{?_smp_mflags}
 
 
 %install
 rm -rf %{buildroot}
 %qmake5_install
-install -d %{buildroot}%{_datadir}/icons/hicolor/86x86/apps
-install -m 0444 -t %{buildroot}%{_datadir}/icons/hicolor/86x86/apps data/%{name}.png
 
 desktop-file-install --delete-original       \
   --dir %{buildroot}%{_datadir}/applications             \
@@ -61,11 +56,11 @@ desktop-file-install --delete-original       \
 
 %files
 %defattr(-,root,root,-)
-%{_datadir}/applications/%{name}.desktop
-%{_datadir}/%{name}/qml
-%{_datadir}/%{name}/qml/i18n
-%{_datadir}/icons/hicolor/86x86/apps
-%{_bindir}
+%{_datadir}/applications/*.desktop
+%dir %{_datadir}/%{name}
+%{_datadir}/%{name}/qml/*
+%{_datadir}/%{name}/translations/%{name}-*.qm
+%{_datadir}/icons/hicolor/*/apps/%{name}.png
 
 %changelog
 

@@ -1,16 +1,16 @@
 TARGET = trollbridge
-CONFIG += sailfishapp sailfishapp_i18n
+CONFIG += sailfishapp_qml sailfishapp_i18n
 INCLUDEPATH += .
 
 lupdate_only {
-SOURCES += \
-	About.qml\
-	Cover.qml\
-	ImageList.qml\
-	JSBridge.qml\
-	Shutter.qml\
-	TrollBridge.qml\
-	main.qml
+	SOURCES += \
+		About.qml\
+		Cover.qml\
+		ImageList.qml\
+		JSBridge.qml\
+		Shutter.qml\
+		TrollBridge.qml\
+		main.qml
 }
 
 
@@ -21,10 +21,11 @@ desktop.files = $${TARGET}.desktop
 desktop.path = $$PREFIX/share/applications
 INSTALLS += desktop
 
-qml.files = qml
-qml.path = $$PREFIX/share/$${TARGET}
+qml.files = $$files(*.qml) $$files(logo/*.png)
+qml.path = $$PREFIX/share/harbour-$${TARGET}/qml/
 INSTALLS += qml
 
 OTHER_FILES += $$files(rpm/*)
 
 include(translations/translations.pri)
+include(icons/icons.pri)
