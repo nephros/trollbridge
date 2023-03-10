@@ -1,5 +1,5 @@
 qm.input    = TRANSLATIONS
-qm.output   = $$OUT_PWD/translations/harbour-${QMAKE_FILE_BASE}.qm
+qm.output   = $$OUT_PWD/translations/${QMAKE_FILE_BASE}.qm
 qm.commands = @echo "compiling ${QMAKE_FILE_NAME}"; \
                 lrelease -removeidentical -silent ${QMAKE_FILE_NAME} -qm ${QMAKE_FILE_OUT}
 ### ID based translation:
@@ -10,7 +10,7 @@ qm.CONFIG   = target_predeps no_link
 QMAKE_EXTRA_COMPILERS += qm
 
 translations.files = $$OUT_PWD/translations/*.qm
-translations.path  = $$PREFIX/share/harbour-$$TARGET/translations
+translations.path  = $$PREFIX/share/$$TARGET/translations
 translations.CONFIG += no_check_exist
 
 INSTALLS += translations

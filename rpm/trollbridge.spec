@@ -61,6 +61,7 @@ desktop-file-install --delete-original       \
 %{_datadir}/%{name}/qml/*
 %{_datadir}/%{name}/translations/%{name}-*.qm
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
+%{_datadir}/icons/hicolor/*/apps/%{name}.svg
 
 %changelog
 
