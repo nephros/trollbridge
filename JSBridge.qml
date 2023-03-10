@@ -21,6 +21,27 @@ Item { id: control
         target: FileEngine
         onError: function(e,f) { console.warn("error:", e , f)}
     }
+    // timer as a queue for download events
+    property int dlnum: 0
+    property ListModel dlq: ListModel {}
+    property int qnum: dlq.count
+    onQnumChanged: console.debug("num:",qnum, dlnum)
+    Timer {
+        property int max: 4 // Q 4 things, or less
+        interval: 1200
+        repeat: true
+        running: (dlnum < max) && (qnum > 0)
+        onTriggered: {
+            max = (dlq.count) < max ? dlq.count : max
+            for (var i = 0; i < max; i++) {
+                const e = dlq.get(0)
+                const trollDir  = cachePath + "/" + model + e["path"]
+                xhrbin(config.hostaddr + "get_thumbnail.cgi?DIR=" + e["path"] + "/" + e["file"], e["file"], trollDir)
+                dlq.remove(0)
+            }
+        }
+    }
+
     // assert all dl paths are there:
     onModelChanged: checkPaths()
     function checkPaths() {
@@ -33,27 +54,25 @@ Item { id: control
         }
     }
     function mkdirpath(p) {
-        console.debug("asserting path exists:", p)
+        //console.debug("asserting path exists:", p)
         const dirs = p.split("/");
         const path = "/"
-        for (dir in dirs) {
+        dirs.forEach(function(dir) {
             if (!FileEngine.exists(path + "/" + dir)) {
                 FileEngine.mkdir(path, dir, true)
                 console.debug("made:", dir)
             }
             path = path + "/" + dir
-        }
+        })
     }
 
     /*
      * properties from trollbridge:
      */
 
-    //property ListModel photoModel: ListModel{}
-
-    //property ListElement elemProto: ListElement { property var file: {} }
     property ListModel _list: ListModel {}
-    property string downloadPath: StandardPaths.pictures + "/" + Qt.application.name
+    //property string downloadPath: StandardPaths.pictures + "/" + Qt.application.name
+    property string downloadPath: StandardPaths.pictures + "/Olympus"
     property string model
     property string type
     property bool connected: mainWindow.online && (!!model && (model !== ""))
@@ -262,8 +281,7 @@ Item { id: control
             const trollDir  = cachePath + "/" + model + rowData[0]
             const trollPath  = trollDir + "/" + rowData[1]
             // TODO: make only once!
-            mkdirpath(trollPath)
-            //const f = rowData[1].substring(rowData[1].lastIndexOf("."))
+            mkdirpath(trollDir)
             const e = {}
             // whats this for and why this value?
             //e["index"]       = rowData[1].substring(4,8) + fileType
@@ -278,24 +296,31 @@ Item { id: control
             e["downloaded"]  = false
             e["quarter"   ]  = false
             //_list.append(e);
+
             // download thumbnails
             fi.url = Qt.resolvedUrl(trollPath);
             //fi.refresh();
             if (FileEngine.exists(trollPath) && (fi.size!==0)) {
-                console.debug("file exists:", e["file"], e["size"], fi.size)
+                //console.debug("file exists:", e["file"], e["size"], fi.size)
                 _list.append(e);
                 return
             } else {
-               xhrbin(config.hostaddr + "get_thumbnail.cgi?DIR=" + e["path"] + "/" + e["file"], e["file"], trollDir)
+               //xhrbin(config.hostaddr + "get_thumbnail.cgi?DIR=" + e["path"] + "/" + e["file"], e["file"], trollDir)
+                dlq.append(e)
+               console.debug("queued:", e["file"])
             }
         })
         console.debug("found", _list.count+"/"+d.length, "entries")
     }
 
     function xhrbin(url, name, path) {
+        console.debug("called:", url,name,path)
+        control.dlnum++
+        console.debug("called.")
         var query = Qt.resolvedUrl(url);
         var r = new XMLHttpRequest();
-        r.open('GET', query, false); // false: try non-async
+        //r.open('GET', query, false); // false: try non-async
+        r.open('GET', query);
         r.responseType = 'arraybuffer';
         r.setRequestHeader("User-Agent", config.agent)
         r.setRequestHeader("Host", config.host)
@@ -311,9 +336,11 @@ Item { id: control
                     console.debug("OK, file written.", tmp);
                     FileEngine.rename(tmp, path + "/" + name, true);
                     console.debug("OK, file copied.", path + "/"+ name);
+                    control.dlnum--
                 } else {
                     console.debug("error in processing request.", r.status, r.statusText, query);
                     control.lastError = r.statusText;
+                    control.dlnum--
                 }
             }
         }
