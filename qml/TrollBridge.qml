@@ -2,7 +2,6 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Page {
-	Component.onCompleted: if (!bridge.connected) dbus.connect()
 	SilicaFlickable {
 		anchors.fill: parent
 		contentHeight: column.height + Theme.paddingLarge
@@ -13,10 +12,16 @@ Page {
 				text: qsTr("About Troll Bridge")
 				onClicked: pageStack.push(Qt.resolvedUrl("About.qml"))
 			}
+			MenuItem {
+				text: qsTr("Connect to WiFi...")
+				onClicked: wifi.connect()
+			}
+			busy: !mainWindow.connected
 		}
 
 		PushUpMenu {
 			id: pushUpMenu
+			active: bridge.connected
 			MenuItem {
 				objectName: "cameraSwitch"
 				text: qsTr("Power Off")

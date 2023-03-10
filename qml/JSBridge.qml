@@ -5,7 +5,6 @@ import Nemo.FileManager 1.0
 
 Item { id: control
 
-    //Component.onCompleted: if (!connected) dbus.connect()
     // my properties:
     property var config: {
         "host": "192.168.0.10",
@@ -15,17 +14,36 @@ Item { id: control
     property string cachePath: StandardPaths.cache
     property bool err: false
     property var lastError: ["",]
+
+    /*
+     * properties from trollbridge.go:
+     */
+
+    property ListModel _list: ListModel {}
+    //property string downloadPath: StandardPaths.pictures + "/" + Qt.application.name
+    property string downloadPath: StandardPaths.pictures + "/Olympus" // legacy
+    property string model: ""
+    property string type: ""
+    property bool connected: mainWindow.online && (!!model && (model !== ""))
+    property bool downloading: false
+    property bool opc: (type === "OPC")
+
+    /*
+     * helper types and stuff
+     */
+
+    // file handling
     property ShareAction sac: ShareAction{}
     property FileInfo fi: FileInfo{}
     Connections {
         target: FileEngine
         onError: function(e,f) { console.warn("error:", e , f)}
     }
-    // timer as a queue for download events
-    property int dlnum: 0
+    // a queue for download events
     property ListModel dlq: ListModel {}
+    property int dlnum: 0
     property int qnum: dlq.count
-    onQnumChanged: console.debug("num:",qnum, dlnum)
+    //onQnumChanged: console.debug("num:",qnum, dlnum)
     Timer {
         property int max: 4 // Q 4 things, or less
         interval: 1200
@@ -67,31 +85,29 @@ Item { id: control
     }
 
     /*
-     * properties from trollbridge:
+     * functions from trollbridge.go:
      */
 
-    property ListModel _list: ListModel {}
-    //property string downloadPath: StandardPaths.pictures + "/" + Qt.application.name
-    property string downloadPath: StandardPaths.pictures + "/Olympus"
-    property string model
-    property string type
-    property bool connected: mainWindow.online && (!!model && (model !== ""))
-    property bool downloading: false
-    property bool opc: (type === "OPC")
-    function runtimeVersion(){ return "QtQuick 2.1" }
+    //function runtimeVersion(){ return "QtQuick 2.1" }
     function version() { return Qt.application.version }
 
-    function switchState(st) {console.debug("called:",st)}
-
-	//ctrl.CameraExecute("exec_pwon", "")
-	//ctrl.CameraExecute("exec_pwoff", "")
+    // SwitchState Switch the camera on or off
+    function switchState(on) {
+		if (on) {
+			cameraExecute("exec_pwon", "")
+		} else {
+			cameraExecute("exec_pwoff", "")
+		}
+    }
+    // CameraExecute Fire GET request to camera
 	function cameraExecute(cmd, path){console.debug("called.")
 	    fireQuery("", cmd, [path], function(r){console.debug(r)} )
     }
-
     // GetImage Get image at list index
     //func (ctrl *BridgeControl) GetImage(index int) *File {
-    function getImage(index) {console.debug("called.")}
+    function getImage(index) {console.debug("called.")
+        return _list.get(index)
+    }
     // SetSelection Set selection at list index
     //func (ctrl *BridgeControl) SetSelection(index string, value bool) {
     function setSelection(index, value){
@@ -118,35 +134,28 @@ Item { id: control
     // DownloadSelected Downloads all selected files
     //func (ctrl *BridgeControl) DownloadSelected(quarterSize bool) {
     function downloadSelected(quarterSize) {
-        downloading = true
-        for (var i = 0; i < _list.length; i++) {
-            if (o[i].selected) {
-                o[i].downloading = true
-                updateItem(i)
-            }
-        }
         for (var i = 0; i < _list.length; i++) {
             if (o[i].selected) {
                 o[i].downloading = true
                 download(i, quarterSize)
             }
         }
-        downloading = false
     }
     // UpdateItem Downloads the file at index
     //func (ctrl *BridgeControl) UpdateItem(idx int) {
     function updateItem(idx) {console.debug("called.")
+        // probably unneeded
     }
     // SwitchMode Switch the camera mode to rec/play/shutter
     //func (ctrl *BridgeControl) SwitchMode(mode string) {
-    function switchMode(mode) {
+    function switchMode(to) {
         // "play"
         // "rec"
         // "shutter"
         // "standalone"
         if (opc) {
-            if (mode === "shutter") mode = "rec"
-            cameraExecute("switch_cameramode", "mode=" + mode)
+            if (to === "shutter")
+            cameraExecute("switch_cameramode", "mode=" + "rec")
         } else {
             cameraExecute("switch_cammode", "mode=" + mode)
         }
@@ -158,7 +167,6 @@ Item { id: control
             if (opc) {
                 cameraExecute("exec_takemotion", "com=newstarttake")
             } else {
-
                 cameraExecute("exec_shutter", "com=1st2ndpush")
             }
         }

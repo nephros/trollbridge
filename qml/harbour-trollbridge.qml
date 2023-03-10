@@ -9,12 +9,11 @@ ApplicationWindow {
 	initialPage: Component { TrollBridge { id: tbMain } }
 	allowedOrientations: Orientation.All
 	_defaultPageOrientations: Orientation.All
+
 	JSBridge{ id: bridge }
 
 	property alias online: nwHelper.online
 	onOnlineChanged: if (online) bridge.connect()
-
-	//background.wallpaper: wpImage
 
 	// see: https://olympusamerica.com/sites/default/files/2022-02/Olympus-Logo-Usage-Guidelines_1.pdf
 	readonly property color olyblue:   "#08107b"
@@ -32,6 +31,7 @@ ApplicationWindow {
 	palette.highlightColor: olyyellow
 	palette.secondaryHighlightColor: Theme.secondaryHighlightFromColor(olyyellow, Theme.colorScheme)
 	palette.highlightBackgroundColor: Theme.highlightBackgroundFromColor(olyyellow, Theme.colorScheme)
+	palette.highlightDimmerColor: Theme.highlightDimmerFromColor(olyyellow, Theme.colorScheme) 
 
 	NetworkManager {
 		id: nwHelper
@@ -50,7 +50,7 @@ ApplicationWindow {
 		)
 		*/
 	}
-	DBusInterface { id: dbus
+	DBusInterface { id: wifi
 			service: "com.jolla.lipstick.ConnectionSelector"
 			path: "/"
 			iface: "com.jolla.lipstick.ConnectionSelectorIf"
