@@ -14,14 +14,16 @@ Page {
         }
     }
 
-    background: ColorBackground { color: "black" }
+    //background: ColorBackground { color: "black" }
 
+    property ListModel photoModel: bridge._list
+	/*
     ListModel {
         id: photoModel
         objectName: "photoModel"
 
         property var addItem: null
-        onAddItemChanged: { 
+        onAddItemChanged: {
             if (addItem !== null) {
                 this.append(addItem);
             }
@@ -46,6 +48,7 @@ Page {
             }
         }
     }
+	*/
 
     SilicaGridView {
         id: thumbGridView
