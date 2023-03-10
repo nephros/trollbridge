@@ -20,7 +20,7 @@ for(iconsize, appicon.sizes) {
         $${_PRO_FILE_PWD_}/icons/svgs \
         $${_PRO_FILE_PWD_}/icons/$${profile}/apps &&
 
-    appicon.files += $${_PRO_FILE_PWD_}/icons/$${profile}
+    appicon.files += $${_PRO_FILE_PWD_}/icons/hicolor/$${profile}
 }
 appicon.commands += true
 appicon.path = $$PREFIX/share/icons/hicolor/
