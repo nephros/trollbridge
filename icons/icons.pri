@@ -23,7 +23,7 @@ for(iconsize, appicon.sizes) {
     appicon.files += $${_PRO_FILE_PWD_}/icons/hicolor/$${profile}
 }
 appicon.commands += true
-appicon.path = $$PREFIX/share/icons/hicolor/
+appicon.path = $$PREFIX/share/icons/hicolor
 
 # also install SVG:
 svg.path = $$PREFIX/share/icons/hicolor/scalable/apps
