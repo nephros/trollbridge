@@ -81,15 +81,14 @@ Item { id: control
     function runtimeVersion(){ return "QtQuick 2.1" }
     function version() { return Qt.application.version }
 
-    function switchState(b_what) {console.debug("called.")}
+    function switchState(st) {console.debug("called:",st)}
 
-    function getModel() {
-        return _list
-    }
 	//ctrl.CameraExecute("exec_pwon", "")
 	//ctrl.CameraExecute("exec_pwoff", "")
-	function cameraExecute(cmd, path){console.debug("called.")}
-   
+	function cameraExecute(cmd, path){console.debug("called.")
+	    fireQuery("", cmd, [path], function(r){console.debug(r)} )
+    }
+
     // GetImage Get image at list index
     //func (ctrl *BridgeControl) GetImage(index int) *File {
     function getImage(index) {console.debug("called.")}
