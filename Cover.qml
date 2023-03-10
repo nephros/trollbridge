@@ -22,7 +22,7 @@ CoverBackground {
 
 		Image {
 			anchors.horizontalCenter: parent.horizontalCenter
-			source: "image://theme/harbour-trollbridge.png"
+			source: "image://theme/harbour-trollbridge"
 		}
 
 		Label {
