@@ -17,7 +17,7 @@ CoverBackground {
 			id: coverdata
 			objectName: "coverData"
 			anchors.horizontalCenter: parent.horizontalCenter
-			color: Theme.highlightColor
+			color: mainWindow.palette.highlightColor
 			font.pixelSize: Theme.fontSizeLarge
 			text: (bridge.connected ? bridge.model + "<br>" + "connected" : "disconnected")
 		}

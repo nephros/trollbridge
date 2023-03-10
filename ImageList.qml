@@ -158,7 +158,7 @@ Page {
 
                 text: (imageList.mode !== "" ? imageList.mode : "Images")
                 font.pixelSize: Theme.fontSizeLarge
-                color: Theme.highlightColor
+                color: mainWindow.palette.highlightColor
                 horizontalAlignment: Text.AlignRight
             }
 
@@ -168,7 +168,7 @@ Page {
 
                 text: (imageList.mode !== "" ? "from " : "on ") + bridge.model
                 font.pixelSize: Theme.fontSizeMedium
-                color: Theme.secondaryHighlightColor
+                color: mainWindow.palette.secondaryHighlightColor
                 horizontalAlignment: Text.AlignRight
             }
         }

@@ -34,7 +34,7 @@ Page {
 				objectName: "modelLabel"
 				text: bridge.model
 				anchors.horizontalCenter: parent.horizontalCenter
-				color: Theme.highlightColor
+				color: mainWindow.palette.highlightColor
 				font.pixelSize: Theme.fontSizeLarge
 				font.family: Theme.fontFamilyHeading
 			}
