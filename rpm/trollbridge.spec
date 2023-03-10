@@ -44,7 +44,7 @@ Url:
 %build
 %qmake5 
 
-#make %%{?_smp_mflags}
+make %%{?_smp_mflags}
 
 
 %install
