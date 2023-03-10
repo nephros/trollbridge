@@ -5,7 +5,7 @@ import Nemo.FileManager 1.0
 
 Item { id: control
 
-    Component.onCompleted: connect()
+    Component.onCompleted: if (!connected) dbus.connect()
     // my properties:
     property var config: {
         "host": "192.168.0.10",
