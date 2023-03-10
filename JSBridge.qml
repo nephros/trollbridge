@@ -3,7 +3,7 @@ import Sailfish.Silica 1.0
 import Sailfish.Share 1.0
 import Nemo.FileManager 1.0
 
-QtObject { id: control
+Item { id: control
 
     Component.onCompleted: connect()
     // my properties:
@@ -14,41 +14,78 @@ QtObject { id: control
     }
     property string cachePath: StandardPaths.cache
     property bool err: false
-    property var errMsg: ["",]
+    property var lastError: ["",]
     property ShareAction sac: ShareAction{}
-    // properties from trollbridge:
+    property FileInfo fi: FileInfo{}
+    Connections {
+        target: FileEngine
+        onError: function(e,f) { console.warn("error:", e , f)}
+    }
+    // assert all dl paths are there:
+    onModelChanged: checkPaths()
+    function checkPaths() {
+        if (!model || model === "" ) return
+        if (!FileEngine.exists(downloadPath + "/" + model)) {
+            mkdirpath(downloadPath + "/" + model)
+        }
+        if (!FileEngine.exists(cachePath + model)) {
+            mkdirpath(cachePath + "/" + model)
+        }
+    }
+    function mkdirpath(p) {
+        console.debug("asserting path exists:", p)
+        const dirs = p.split("/");
+        const path = "/"
+        for (dir in dirs) {
+            if (!FileEngine.exists(path + "/" + dir)) {
+                FileEngine.mkdir(path, dir, true)
+                console.debug("made:", dir)
+            }
+            path = path + "/" + dir
+        }
+    }
+
+    /*
+     * properties from trollbridge:
+     */
+
     //property ListModel photoModel: ListModel{}
 
     //property ListElement elemProto: ListElement { property var file: {} }
     property ListModel _list: ListModel {}
-    //property string downloadPath: Sailfish.Silica.StandardPaths.pictures
-    property string downloadPath: StandardPaths.pictures
+    property string downloadPath: StandardPaths.pictures + "/" + Qt.application.name
     property string model
     property string type
-    property bool connected: false //( Qt.application.name ===  "QtQmlViewer" ) ? true : false
+    property bool connected: mainWindow.online && (!!model && (model !== ""))
     property bool downloading: false
     property bool opc: (type === "OPC")
     function runtimeVersion(){ return "QtQuick 2.1" }
     function version() { return Qt.application.version }
 
-    function switchState(b_what){}
+    function switchState(b_what) {console.debug("called.")}
 
+    function getModel() {
+        return _list
+    }
 	//ctrl.CameraExecute("exec_pwon", "")
 	//ctrl.CameraExecute("exec_pwoff", "")
 	function cameraExecute(cmd, path){console.debug("called.")}
    
     // GetImage Get image at list index
     //func (ctrl *BridgeControl) GetImage(index int) *File {
-    function getImage(index)  {}
+    function getImage(index) {console.debug("called.")}
     // SetSelection Set selection at list index
     //func (ctrl *BridgeControl) SetSelection(index string, value bool) {
-    function setSelection(index, value) {}
+    function setSelection(index, value){
+        console.debug("called:",index,value)
+        _list.setProperty(index, "selected", value)
+    }
     // SetSelectionItem Set selection at list index
     //func (ctrl *BridgeControl) SetSelectionItem(idx int, value bool) {
-    function setSelectionItem(idx, value) {}
+    function setSelectionItem(idx, value){console.debug("called.")}
     // ClearAllSelection Clears the file list selection
     //func (ctrl *BridgeControl) ClearAllSelection() {
-    function clearAllSelection() {}
+    function clearAllSelection(){console.debug("called.")}
     // Download Downloads the file at index
     //func (ctrl *BridgeControl) Download(idx int, quarterSize bool) {
     function download(idx , quarterSize) {
@@ -121,7 +158,7 @@ QtObject { id: control
 			if (connected && !err) { switchMode("standalone") }
 			if (model === "") { cameraGetValue("get_caminfo", "/caminfo/model") }
 		}
-        connected = true
+        //connected = true
     }
 
     // SetModel BridgeControl Model setter 
@@ -152,6 +189,7 @@ QtObject { id: control
     //func (ctrl *BridgeControl) CameraGetFolder(path string) error {
     function cameraGetFolder(path) {
 	    fireQuery("", "get_imglist", [ "DIR=" + path, ], function(d) { handleImgList(d) } )
+
         console.debug("done.")
     }
     // CameraGetFile Gets a file from camera
@@ -174,7 +212,7 @@ QtObject { id: control
     }
 
     function fireQuery(requestType , query , params, callback){
-       console.debug("firequery: r", requestType,"q" , query, "p", params.join(" "), "cb", callback)
+       console.debug("r", requestType,"q" , query, "p", params.join(" "), "cb", callback)
 
         //if (!callback || callback === null || typeof(callback) === undefined) {
         //    function callback() {console.debug("default callback")};
@@ -199,13 +237,14 @@ QtObject { id: control
                 if (xhr.status === 206) { // partial
                     var rdata = xhr.response;
                     callback(rdata)
-                } else if (xhr.status === 200 || xhr.status == 0) {
+                } else if (xhr.status === 200) {
+                //} else if (xhr.status === 200 || xhr.status == 0) {
                     var rdata = xhr.response;
                     //console.debug("got:", rdata)
                     callback(rdata)
                 } else {
                     console.debug("error in processing request.", query, xhr.status, xhr.statusText);
-                    obj.lastError = xhr.statusText;
+                    control.lastError = xhr.statusText;
                 }
             }
         }
@@ -220,10 +259,18 @@ QtObject { id: control
             //               path          ,filename    ,size   ,?,?????,?????
             const rowData = line.split(",")
             const fileType = rowData[1].split(".")[1]
-            const trollPath  = cachePath + "/" + model + rowData[0] + "/" + rowData[1]
+            const trollDir  = cachePath + "/" + model + rowData[0]
+            const trollPath  = trollDir + "/" + rowData[1]
+        if (!FileEngine.exists(trollPath)) {
+            FileEngine.mkdir(trollDir, rowData[0], true)
+            FileEngine.mkdir(trollPath, "DCIM", true)
+            FileEngine.mkdir(trollPath + "/" + "DCIM", rowData[0].substring(rowData[0].lastIndexOf("/")), true)
+        }
             //const f = rowData[1].substring(rowData[1].lastIndexOf("."))
             const e = {}
-            e["index"]       = rowData[1].substring(4,8) + fileType
+            // whats this for and why this value?
+            //e["index"]       = rowData[1].substring(4,8) + fileType
+            //e["index"]       = _list.count
             e["path"]        = rowData[0]
             e["file"]        = rowData[1]
             e["trollPath"]   = trollPath
@@ -233,21 +280,25 @@ QtObject { id: control
             e["selected"  ]  = false
             e["downloaded"]  = false
             e["quarter"   ]  = false
-            _list.append(e);
+            //_list.append(e);
             // download thumbnails
-            if (FileEngine.exists(trollPath)) {
+            fi.url = Qt.resolvedUrl(trollPath);
+            //fi.refresh();
+            if (FileEngine.exists(trollPath) && (fi.size!==0)) {
+                console.debug("file exists:", e["file"], e["size"], fi.size)
+                _list.append(e);
+                return
             } else {
-                FileEngine.mkdir(cachePath + "/" + model + rowData[0], Qt.application.name, true);
-                xhrbin(config.hostaddr + "get_thumbnail.cgi?DIR=" + e["path"] + e["file"], e["file"], e["trollPath"])
+               xhrbin(config.hostaddr + "get_thumbnail.cgi?DIR=" + e["path"] + "/" + e["file"], e["file"], trollDir)
             }
         })
-        console.debug("found", _list.count, "entries")
+        console.debug("found", _list.count+"/"+d.length, "entries")
     }
 
     function xhrbin(url, name, path) {
         var query = Qt.resolvedUrl(url);
         var r = new XMLHttpRequest();
-        r.open('GET', query);
+        r.open('GET', query, false); // false: try non-async
         r.responseType = 'arraybuffer';
         r.setRequestHeader("User-Agent", config.agent)
         r.setRequestHeader("Host", config.host)
@@ -264,8 +315,8 @@ QtObject { id: control
                     FileEngine.rename(tmp, path + "/" + name, true);
                     console.debug("OK, file copied.", path + "/"+ name);
                 } else {
-                    console.debug("error in processing request.", r.status, r.statusText);
-                    obj.lastError = r.statusText;
+                    console.debug("error in processing request.", r.status, r.statusText, query);
+                    control.lastError = r.statusText;
                 }
             }
         }

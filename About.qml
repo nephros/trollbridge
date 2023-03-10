@@ -28,12 +28,11 @@ Page {
 			}
 			Label {
 				text: qsTr("TRaveller's OLympus Bridge is an Olympus cameras control application<br><br>\
-				Troll Bridge supports both OM-D/PEN WiFi cameras and Olympus Air.<br>\
-				The name of the application was chosen in memory of Terry Pratchett,<br>\
-				who died on March 12th, 2015.<br>\
-				This application has been build using GO language and QML bindings.<br>\
+				Troll Bridge supports both OM-D/PEN WiFi cameras and Olympus Air.<br><br>\
+				The name of the application was chosen in memory of Terry Pratchett, who died on March 12th, 2015.<br>\
+				Thie original application has been build using GO language and QML bindings.<br>\
 				(C)2016 Bundyo, released under the MIT license.<br>\
-				Rewritten to replace GO with plain JavaScript by nephros<br>\
+				Rewritten to replace GO with pure QML and JavaScript by nephros<br>\
 				(C)2023 nephros, released under the MIT license.")
 				anchors.horizontalCenter: parent.horizontalCenter
 				wrapMode: Text.WrapAtWordBoundaryOrAnywhere
