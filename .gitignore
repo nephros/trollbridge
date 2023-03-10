@@ -1,2 +1,6 @@
 .vscode/*
 .*.swp
+translations/*.qm
+*.list
+Makefile
+icons/*x*
