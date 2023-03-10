@@ -3,18 +3,6 @@ import Sailfish.Silica 1.0
 
 CoverBackground {
 
-	Image {
-		source: "./cover.png"
-		z: -1
-		anchors {
-			//bottom: parent.bottom
-			//horizontalCenter: parent.horizontalCenter
-			centerIn: parent
-		}
-		sourceSize.width: Theme.iconSizeLarge*2
-		fillMode: Image.PreserveAspectFit
-		opacity: 0.2
-	}
 	Column {
 		anchors.centerIn: parent
 		width: parent.width
@@ -22,7 +10,8 @@ CoverBackground {
 
 		Image {
 			anchors.horizontalCenter: parent.horizontalCenter
-			source: "image://theme/harbour-trollbridge"
+			source: (bridge.connected) ? "image://theme/harbour-trollbridge" : "./cover.png"
+			width: Theme.iconSizeLarge
 		}
 
 		Label {

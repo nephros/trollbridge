@@ -2,7 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 Page {
-    Component.onCompleted: if (!bridge.connected) dbus.connect()
+	Component.onCompleted: if (!bridge.connected) dbus.connect()
 	SilicaFlickable {
 		anchors.fill: parent
 		contentHeight: column.height + Theme.paddingLarge
@@ -31,6 +31,15 @@ Page {
 			spacing: Theme.paddingLarge
 			width: parent.width
 			PageHeader { title: qsTr("Troll Bridge") }
+			Image {
+				height: Theme.itemSizeMedium
+				sourceSize.height: height
+				//width: parent.width
+				//anchors.centerIn: parent
+				anchors.horizontalCenter: parent.horizontalCenter
+				fillMode: Image.PreserveAspectFit
+				source: (Theme.colorScheme === Theme.LightOnDark ) ?  Qt.resolvedUrl("logo/OlympusLogoWhiteAndGoldRGB.png") : Qt.resolvedUrl("logo/OlympusLogoBlueAndGoldRGB.png")
+			}
 			Label {
 				objectName: "modelLabel"
 				text: bridge.model
