@@ -12,6 +12,7 @@ CoverBackground {
 			anchors.horizontalCenter: parent.horizontalCenter
 			source: (bridge.connected) ? "image://theme/harbour-trollbridge" : "./cover.png"
 			width: Theme.iconSizeLarge
+			height: Theme.iconSizeLarge
 		}
 
 		Label {
