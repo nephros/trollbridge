@@ -16,12 +16,12 @@ Page {
 				text: qsTr("Connect to WiFi...")
 				onClicked: wifi.connect()
 			}
-			busy: !mainWindow.connected
+			busy: bridge.connected ? false : (!mainWindow.connected)
 		}
 
 		PushUpMenu {
 			id: pushUpMenu
-			active: bridge.connected
+			enabled: bridge.connected
 			MenuItem {
 				objectName: "cameraSwitch"
 				text: qsTr("Power Off")
