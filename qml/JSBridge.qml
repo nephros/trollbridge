@@ -32,6 +32,14 @@ Item { id: control
      * helper types and stuff
      */
 
+    WorkerScript { id: worker
+        source: "js/worker.js"
+        //onReadyChanged: console.log("WS ready")
+        onMessage: {
+            console.log("WS got msg back:", messageObject)
+        }
+        function download(m){ sendMessage(m) }
+    }
     // file handling
     property ShareAction sac: ShareAction{}
     property FileInfo fi: FileInfo{}
@@ -50,6 +58,7 @@ Item { id: control
         repeat: true
         running: (dlnum < max) && (qnum > 0)
         onTriggered: {
+            worker.download(dlq)
             max = (dlq.count) < max ? dlq.count : max
             for (var i = 0; i < max; i++) {
                 const e = dlq.get(0)
