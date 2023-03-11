@@ -157,7 +157,7 @@ Item { id: control
             if (to === "shutter")
             cameraExecute("switch_cameramode", "mode=" + "rec")
         } else {
-            cameraExecute("switch_cammode", "mode=" + mode)
+            cameraExecute("switch_cammode", "mode=" + to)
         }
     }
     // ShutterToggle Toggle the remote shutter
