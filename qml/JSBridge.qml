@@ -34,11 +34,14 @@ Item { id: control
 
     WorkerScript { id: worker
         source: "js/worker.js"
-        //onReadyChanged: console.log("WS ready")
-        onMessage: {
-            console.log("WS got msg back:", messageObject)
+        onMessage: function(m) {
+            //console.log("WS got msg back:", m.event)
+            if (m.event === "thumbReceived") { handleDownloadedFile(m.name, m.type, m.data, m.path) }
+            else if (m.event === "error")    { control.lastError += m.message }
+            else if (m.event === "queued")   {control.numDownloads +=1 }
+            else if (m.event === "dequeued") {control.numDownloads -=1 }
+            else { console.warn("Unhandled message from worker:", m.event) }
         }
-        function download(m){ sendMessage(m) }
     }
     // file handling
     property ShareAction sac: ShareAction{}
@@ -47,27 +50,10 @@ Item { id: control
         target: FileEngine
         onError: function(e,f) { console.warn("error:", e , f)}
     }
-    // a queue for download events
+
+    // queue for downloads, passed to worker:
     property ListModel dlq: ListModel {}
-    property int dlnum: 0
-    property int qnum: dlq.count
-    //onQnumChanged: console.debug("num:",qnum, dlnum)
-    Timer {
-        property int max: 4 // Q 4 things, or less
-        interval: 1200
-        repeat: true
-        running: (dlnum < max) && (qnum > 0)
-        onTriggered: {
-            worker.download(dlq)
-            max = (dlq.count) < max ? dlq.count : max
-            for (var i = 0; i < max; i++) {
-                const e = dlq.get(0)
-                const trollDir  = cachePath + "/" + model + e["path"]
-                xhrbin(config.hostaddr + "get_thumbnail.cgi?DIR=" + e["path"] + "/" + e["file"], e["file"], trollDir)
-                dlq.remove(0)
-            }
-        }
-    }
+    property int numDownloads: 0
 
     // assert all dl paths are there:
     onModelChanged: checkPaths()
@@ -92,6 +78,18 @@ Item { id: control
             path = path + "/" + dir
         })
     }
+    function handleDownloadedFile(name, type, data, path) {
+        return
+        //console.debug("OK, filehandling:", name, type, data );
+        var tmp = sac.writeContentToFile(
+            { "name": name, "type": type, "data": data }
+        )
+        fi.url = tmp
+        //console.debug("OK, file written.", tmp, fi.size);
+        FileEngine.rename(tmp, path, true);
+        fi.url = path
+        //console.debug("OK, file copied.", path, fi.size);
+    }
 
     /*
      * functions from trollbridge.go:
@@ -109,7 +107,7 @@ Item { id: control
 		}
     }
     // CameraExecute Fire GET request to camera
-	function cameraExecute(cmd, path){console.debug("called.")
+	function cameraExecute(cmd, path){console.debug("called:", cmd, path)
 	    fireQuery("", cmd, [path], function(r){console.debug(r)} )
     }
     // GetImage Get image at list index
@@ -157,7 +155,7 @@ Item { id: control
     }
     // SwitchMode Switch the camera mode to rec/play/shutter
     //func (ctrl *BridgeControl) SwitchMode(mode string) {
-    function switchMode(to) {
+    function switchMode(to) { console.debug("called.")
         // "play"
         // "rec"
         // "shutter"
@@ -253,7 +251,7 @@ Item { id: control
     }
 
     function fireQuery(requestType , query , params, callback){
-       console.debug("r", requestType,"q" , query, "p", params.join(" "), "cb", callback)
+       console.debug(requestType, " ", query, " ", params.join(" ") )
 
         if (!requestType || requestType === "") requestType = "GET"
         const paramString = (params.length > 0) ? "?" + params.join("&") : ""
@@ -269,7 +267,7 @@ Item { id: control
         xhr.send()
         xhr.onreadystatechange = function(event) {
             if (xhr.readyState == XMLHttpRequest.DONE) {
-                console.debug("REQ: done,", xhr.status)
+                console.debug("REQ: done,", xhr.status, xhr.statusText)
                 if (xhr.status === 206) { // partial
                     var rdata = xhr.response;
                     callback(rdata)
@@ -322,46 +320,20 @@ Item { id: control
                 _list.append(e);
                 return
             } else {
-               //xhrbin(config.hostaddr + "get_thumbnail.cgi?DIR=" + e["path"] + "/" + e["file"], e["file"], trollDir)
-                dlq.append(e)
-               console.debug("queued:", e["file"])
+               dlq.append(e)
             }
         })
-        console.debug("found", _list.count+"/"+d.length, "entries")
+        console.debug("found", _list.count + "/" + d.length, "entries, ", dlq.count, "missing thumbs")
+        worker.sendMessage({ action: "download", parm: { model: dlq } })
     }
 
-    function xhrbin(url, name, path) {
-        console.debug("called:", url,name,path)
-        control.dlnum++
-        console.debug("called.")
-        var query = Qt.resolvedUrl(url);
-        var r = new XMLHttpRequest();
-        //r.open('GET', query, false); // false: try non-async
-        r.open('GET', query);
-        r.responseType = 'arraybuffer';
-        r.setRequestHeader("User-Agent", config.agent)
-        r.setRequestHeader("Host", config.host)
-
-        r.send();
-        r.onreadystatechange = function(event) {
-            if (r.readyState == XMLHttpRequest.DONE) {
-                if (r.status === 200 || r.status == 0) {
-                    console.debug("OK, data received.", r.status, r.statusText, r.getResponseHeader("mime-type"));
-                    var tmp = sac.writeContentToFile(
-                        { "name": name, "type": r.getResponseHeader("mime-type"), "data": r.response }
-                    )
-                    console.debug("OK, file written.", tmp);
-                    FileEngine.rename(tmp, path + "/" + name, true);
-                    console.debug("OK, file copied.", path + "/"+ name);
-                    control.dlnum--
-                } else {
-                    console.debug("error in processing request.", r.status, r.statusText, query);
-                    control.lastError = r.statusText;
-                    control.dlnum--
-                }
-            }
-        }
+    function  handleDownloadedData(name, type, data, path){
+        var tmp = sac.writeContentToFile( { "name": name, "type": type, "data": data })
+        //console.debug("OK, file written.", tmp);
+        FileEngine.rename(tmp, path + "/" + name, true);
+        console.debug("OK, file copied.", path + "/"+ name);
     }
+
 
 }
 
