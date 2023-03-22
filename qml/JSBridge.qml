@@ -81,7 +81,7 @@ Item { id: control
         })
     }
     function handleDownloadedFile(name, type, data, path) {
-        return
+        //return
         //console.debug("OK, filehandling:", name, type, data );
         var tmp = sac.writeContentToFile(
             { "name": name, "type": type, "data": data }
@@ -94,16 +94,12 @@ Item { id: control
     }
 
     Timer{ id: qTimer
-        repeat: false
-        running: (numDownloads < maxDownloads)
-        interval: 2000
+        repeat: (dlq.count > 0 )
+        //running: (dlq.count > 0 )
+        interval: 1200
         onTriggered: {
-            dlb.clear();
-            for (var i=0; i<maxDownloads; ++i){
-                dlb.append(dlq.get(i));
-                dlq.remove(i);
-                worker.sendMessage({ action: "download", parm: { model: dlb } })
-            }
+            if (dlq.count <= 0){ stop(); return}
+            worker.sendMessage({ action: "download", parm: { model: dlq } })
         }
     }
     function batchDownload(){
