@@ -53,7 +53,9 @@ Item { id: control
 
     // queue for downloads, passed to worker:
     property ListModel dlq: ListModel {}
+    property ListModel dlb: ListModel {}
     property int numDownloads: 0
+    property int maxDownloads: 4
 
     // assert all dl paths are there:
     onModelChanged: checkPaths()
@@ -91,6 +93,22 @@ Item { id: control
         //console.debug("OK, file copied.", path, fi.size);
     }
 
+    Timer{ id: qTimer
+        repeat: false
+        running: (numDownloads < maxDownloads)
+        interval: 2000
+        onTriggered: {
+            dlb.clear();
+            for (var i=0; i<maxDownloads; ++i){
+                dlb.append(dlq.get(i));
+                dlq.remove(i);
+                worker.sendMessage({ action: "download", parm: { model: dlb } })
+            }
+        }
+    }
+    function batchDownload(){
+        qTimer.start()
+    }
     /*
      * functions from trollbridge.go:
      */
@@ -324,7 +342,8 @@ Item { id: control
             }
         })
         console.debug("found", _list.count + "/" + d.length, "entries, ", dlq.count, "missing thumbs")
-        worker.sendMessage({ action: "download", parm: { model: dlq } })
+        //worker.sendMessage({ action: "download", parm: { model: dlq } })
+        control.batchDownload();
     }
 
     function  handleDownloadedData(name, type, data, path){

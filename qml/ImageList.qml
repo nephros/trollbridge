@@ -194,13 +194,13 @@ Page {
                 visible: downloading || thumbImage.status == Image.Loading
                 sourceComponent: thumbBusy
 
-                Component { 
-                    id: thumbBusy 
+                Component {
+                    id: thumbBusy
 
-                    BusyIndicator { 
-                        running: true 
+                    BusyIndicator {
+                        running: true
                         visible: !downloading
-                    } 
+                    }
                 }
 
                 Image {
