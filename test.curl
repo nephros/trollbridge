@@ -1,0 +1,1 @@
+curl  -v -X GET -A OlympusCameraKit http://192.168.0.10/get_thumbnail.cgi?DIR=/DCIM/100OLYMP/_C050001.JPG -o test

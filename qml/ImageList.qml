@@ -173,11 +173,15 @@ Page {
             }
         }
 
-        delegate: Item {
+        //delegate: Item {
+        delegate: Rectangle {
             id: thumbDelegate
 
             width: parent.width / Math.round(parent.width / 200)
             height: width
+
+            border.width: 2
+            border.color: palette.highlightColor
 
             Image {
                 id: thumbImage

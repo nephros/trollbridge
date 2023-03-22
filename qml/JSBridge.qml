@@ -2,6 +2,7 @@ import QtQuick 2.1
 import Sailfish.Silica 1.0
 import Sailfish.Share 1.0
 import Nemo.FileManager 1.0
+//import "js/base64.js" as Base64
 
 Item { id: control
 
@@ -36,8 +37,13 @@ Item { id: control
         source: "js/worker.js"
         onMessage: function(m) {
             //console.log("WS got msg back:", m.event)
-            if (m.event === "thumbReceived") { handleDownloadedFile(m.name, m.type, m.data, m.path) }
-            else if (m.event === "error")    { control.lastError += m.message }
+            if (m.event === "thumbReceived") {
+                //console.debug("got back:", m.data.substr(0,16));
+                handleDownloadedFile(m.name, m.type, m.data, m.path)
+            }
+            else if (m.event === "thumbUrl")      {}//setThumbUrl(m.image) }
+            else if (m.event === "error")    {control.lastError += m.message }
+            else if (m.event === "refused")  {dlqueue.stop()}
             else if (m.event === "queued")   {control.numDownloads +=1 }
             else if (m.event === "dequeued") {control.numDownloads -=1 }
             else { console.warn("Unhandled message from worker:", m.event) }
@@ -46,16 +52,109 @@ Item { id: control
     // file handling
     property ShareAction sac: ShareAction{}
     property FileInfo fi: FileInfo{}
+    //property Image thumb: Image {}
+    /*
+    Canvas {id: grabber
+        visible: false
+        renderStrategy: Canvas.Threaded
+        canvasSize.height: 200
+        canvasSize.width: 200
+        property string outpath: "";
+        property string outname: "";
+        Component.onCompleted: getContext("2d")
+        onPaint: {
+            var c = getContext("2d");
+            c.fillStyle = Qt.rgba(1,0,0,1);
+            c.fillRect(0,0,width,height);
+        }
+        function putImage(i,p,n) {
+            outpath = p;
+            outname = n;
+            loadImage(i);
+        }
+        onImageLoaded: {
+            console.debug(((available) ? "ready" : "not ready"), "img loaded, saving..");
+            if (outpath !== "" ) {
+                var res = "unknown";
+                res = (save(outname, Qt.size(120,160))) ? "true" : "false";
+                console.debug("result:", res);
+            }
+        }
+    } 
+    */
+    Image { id: grabber
+        visible: qModel.count > 0
+        height: 120
+        width: 160
+        sourceSize.height: 120
+        sourceSize.width: 160
+        smooth: false
+        fillMode: Image.PreserveAspectFit
+        property string outpath: "";
+        function putImage(url, path) {
+            source = url;
+            outpath = path;
+        }
+        onStatusChanged: {
+            if (status === Image.Ready ) {
+            console.debug("img loaded, saving..");
+                this.grabToImage(function(result) {
+                    result.saveToFile(grabber.outpath);
+                })
+            }
+        }
+
+    }
+    /*
+    ImageEditPreview { id: grabber
+        //iw.source = data;
+        //iw.target = path;
+        //iw.rotate(0);
+        //source: Image { smooth: false }
+        //target: Image { smooth: false }
+        function putImage(url, path) {
+            source.source = url;
+            target.source = path;
+            rotateImage()
+        }
+        onEdited: console.debug("Edit: done");
+        onFailed: console.debug("Edit: failed");
+    }
+    */
+
     Connections {
         target: FileEngine
         onError: function(e,f) { console.warn("error:", e , f)}
     }
 
     // queue for downloads, passed to worker:
-    property ListModel dlq: ListModel {}
+    property ListModel qModel: ListModel {}
     property ListModel dlb: ListModel {}
     property int numDownloads: 0
     property int maxDownloads: 4
+
+    //FROM https://cdnjs.cloudflare.com/ajax/libs/Base64/1.0.1/base64.js
+    function base64Decode(input) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+        //var str = String(input).replace(/[=]+$/, ''); // #31: ExtendScript bad parse of /=
+        var str = String(input);
+        for (
+            // initialize result and counters
+            var bc = 0, bs, buffer, idx = 0, output = '';
+            // get next character
+            buffer = str.charAt(idx++);
+            // character found in table? initialize bit storage and add its ascii value;
+            ~buffer && (bs = bc % 4 ? bs * 64 + buffer : buffer,
+                // and if not first of each 4 characters,
+                // convert the first 8 bits to one ascii character
+                bc++ % 4) ? output += String.fromCharCode(255 & bs >> (-2 * bc & 6)) : 0
+        ) {
+            // try to find character in table (0-63, not found => -1)
+            buffer = chars.indexOf(buffer);
+        }
+        return output;
+    }
+
 
     // assert all dl paths are there:
     onModelChanged: checkPaths()
@@ -82,28 +181,34 @@ Item { id: control
     }
     function handleDownloadedFile(name, type, data, path) {
         //return
-        //console.debug("OK, filehandling:", name, type, data );
-        var tmp = sac.writeContentToFile(
-            { "name": name, "type": type, "data": data }
-        )
+        console.debug("OK, filehandling:", name, type, data.length, typeof(data) );
+        //console.debug("got:", data.substr(0,16));
+        //const raw = base64Decode(data.base64)
+        
+        var tmp = sac.writeContentToFile( { "name": name, "type": type, "data": data.raw })
         fi.url = tmp
-        //console.debug("OK, file written.", tmp, fi.size);
-        FileEngine.rename(tmp, path, true);
+        console.debug("OK, temp file written.", tmp, fi.size);
+
+        grabber.putImage(data.url, path);
         fi.url = path
+        console.debug("OK, image put:", path, fi.size);
+
+        //fi.url = path
+        //console.debug("OK, Image written:", path, fi.size);
+
+        //FileEngine.rename(tmp, path, true);
+        //fi.url = path
         //console.debug("OK, file copied.", path, fi.size);
     }
 
-    Timer{ id: qTimer
-        repeat: (dlq.count > 0 )
-        //running: (dlq.count > 0 )
+    Timer{ id: dlqueue
+        repeat: (qModel.count > 0 )
+        //running: (qModel.count > 0 )
         interval: 1200
         onTriggered: {
-            if (dlq.count <= 0){ stop(); return}
-            worker.sendMessage({ action: "download", parm: { model: dlq } })
+            if (qModel.count <= 0){ stop(); console.info("queue empty"); return }
+            worker.sendMessage({ action: "download", parm: { model: qModel } })
         }
-    }
-    function batchDownload(){
-        qTimer.start()
     }
     /*
      * functions from trollbridge.go:
@@ -326,20 +431,26 @@ Item { id: control
             e["quarter"   ]  = false
             //_list.append(e);
 
-            // download thumbnails
             fi.url = Qt.resolvedUrl(trollPath);
             //fi.refresh();
-            if (FileEngine.exists(trollPath) && (fi.size!==0)) {
+            if (FileEngine.exists(trollPath)
+                && (fi.size!==0)
+                && (
+                    (fi.mimeType === "image/jpeg") ||
+                    (fi.mimeType === "image/png")  ||
+                    (fi.mimeType === "image/gif")
+                )
+            ) {
                 //console.debug("file exists:", e["file"], e["size"], fi.size)
                 _list.append(e);
                 return
             } else {
-               dlq.append(e)
+               if (FileEngine.exists(trollPath)) FileEngine.deleteFiles(trollPath);
+               qModel.append(e)
             }
         })
-        console.debug("found", _list.count + "/" + d.length, "entries, ", dlq.count, "missing thumbs")
-        //worker.sendMessage({ action: "download", parm: { model: dlq } })
-        control.batchDownload();
+        console.debug("found", _list.count + "/" + d.length, "entries, ", qModel.count, "missing thumbs")
+        dlqueue.start();
     }
 
     function  handleDownloadedData(name, type, data, path){
