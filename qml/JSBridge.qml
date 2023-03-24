@@ -1,7 +1,9 @@
 import QtQuick 2.1
+import QtQuick.LocalStorage 2.0 as LS
 import Sailfish.Silica 1.0
 import Sailfish.Share 1.0
 import Nemo.FileManager 1.0
+//import "js/db.js" as DB
 //import "js/base64.js" as Base64
 
 Item { id: control
@@ -33,12 +35,20 @@ Item { id: control
      * helper types and stuff
      */
 
+    LocalStorage { id: thumbCache
+       function putThumb(obj) {
+           const u = obj.url
+       }
+       function getThumb(path) {}
+       function hasThumb(path) {}
+    }
     WorkerScript { id: worker
         source: "js/worker.js"
         onMessage: function(m) {
             //console.log("WS got msg back:", m.event)
             if (m.event === "thumbReceived") {
                 //console.debug("got back:", m.data.substr(0,16));
+                storeThumb(m.name, m.type, m.data.url, m.path)
                 handleDownloadedFile(m.name, m.type, m.data, m.path)
             }
             else if (m.event === "thumbUrl")      {}//setThumbUrl(m.image) }
@@ -178,6 +188,13 @@ Item { id: control
             }
             path = path + "/" + dir
         })
+    }
+    function storeThumb(name, type, url, path){
+        var t = {
+            path: path,
+            url: url
+        }
+        thumbCache.putThumb(JSON.stringify(t));
     }
     function handleDownloadedFile(name, type, data, path) {
         //return
@@ -444,6 +461,9 @@ Item { id: control
                 //console.debug("file exists:", e["file"], e["size"], fi.size)
                 _list.append(e);
                 return
+            } else if (thumbCache.hasThumb(trollPath)){
+                e["thumbnail"] = thumbCache.getThump(trollPath);
+                _list.append(e);
             } else {
                if (FileEngine.exists(trollPath)) FileEngine.deleteFiles(trollPath);
                qModel.append(e)
