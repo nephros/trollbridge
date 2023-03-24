@@ -1,9 +1,9 @@
 import QtQuick 2.1
-import QtQuick.LocalStorage 2.0 as LS
+//import QtQuick.LocalStorage 2.0 as LS
 import Sailfish.Silica 1.0
 import Sailfish.Share 1.0
 import Nemo.FileManager 1.0
-//import "js/db.js" as DB
+import "js/db.js" as DB
 //import "js/base64.js" as Base64
 
 Item { id: control
@@ -35,12 +35,16 @@ Item { id: control
      * helper types and stuff
      */
 
-    LocalStorage { id: thumbCache
+    QtObject { id: thumbCache
        function putThumb(obj) {
-           const u = obj.url
+           DB.putThumb(obj)
        }
-       function getThumb(path) {}
-       function hasThumb(path) {}
+       function getThumb(path) {
+           return DB.getThumb(path)
+       }
+       function hasThumb(path) {
+           return (DB.hasThumb(path) > 0)
+       }
     }
     WorkerScript { id: worker
         source: "js/worker.js"
