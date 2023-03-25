@@ -8,7 +8,7 @@ Name:       harbour-trollbridge
 # >> macros
 # << macros
 
-Summary:    TRaveller's OLympus Bridge
+Summary:    TRaveller's OLympus Bridge - NoGo
 Version:    0.2.0
 Release:    1
 Group:      Applications/Multimedia
@@ -26,6 +26,8 @@ BuildRequires:  desktop-file-utils
 
 %description
 TRaveller's OLympus Bridge is an app for controlling Olympus OM-D/PEN/Air cameras with integrated WiFi.
+
+This is the Go-less fork
 
 %if "%{?vendor}" == "chum"
 PackageName: Troll Bridge
