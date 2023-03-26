@@ -17,7 +17,7 @@ Page {
     //background: ColorBackground { color: "black" }
 
     property ListModel photoModel: bridge._list
-	/*
+    /*
     ListModel {
         id: photoModel
         objectName: "photoModel"
@@ -48,12 +48,15 @@ Page {
             }
         }
     }
-	*/
+    */
 
     SilicaGridView {
         id: thumbGridView
 
         anchors.fill: parent
+        anchors.horizontalCenter: parent.horizontalCenter
+        leftMargin:Theme.horizontalPageMargin
+        rightMargin:Theme.horizontalPageMargin
         cellWidth: parent.width / Math.round(parent.width / 200)
         cellHeight: cellWidth
         model: photoModel
@@ -62,7 +65,7 @@ Page {
         PullDownMenu {
             id: pdMain
 
-            property string action: "" 
+            property string action: ""
             property var subAction: null
             enabled: !bridge.downloading
 
@@ -140,11 +143,16 @@ Page {
             }
         }
 
+        header: PageHeader {
+                title: (imageList.mode !== "" ? imageList.mode : "Images")
+                description: (imageList.mode !== "" ? "from " : "on ") + bridge.model
+        }
+        /*
         header: Column {
             id: customHeader
 
             width: ( parent.width - ( 2.0 * Theme.paddingLarge ))
-            height: 110
+            //height: 110
             spacing: 0
             x: Theme.paddingLarge
 
@@ -172,6 +180,7 @@ Page {
                 horizontalAlignment: Text.AlignRight
             }
         }
+        */
 
         //delegate: Item {
         delegate: Rectangle {

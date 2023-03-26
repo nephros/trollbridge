@@ -59,9 +59,10 @@ Page {
 				visible: !bridge.connected
 				anchors.horizontalCenter: parent.horizontalCenter
 			}
-			
+
 			Button {
 				text: "Images"
+				icon.source: "image://theme/icon-m-file-image"
 				visible: bridge.connected
 				anchors.horizontalCenter: parent.horizontalCenter
 				onClicked: {
@@ -70,9 +71,10 @@ Page {
 					pageStack.push(Qt.resolvedUrl("ImageList.qml"))
 				}
 			}
-			
-			Button {
+
+			SecondaryButton {
 				text: "Shutter"
+				icon.source: "image://theme/icon-m-cover-camera"
 				visible: bridge.connected && !bridge.opc
 				anchors.horizontalCenter: parent.horizontalCenter
 				onClicked: {
@@ -80,17 +82,19 @@ Page {
 					pageStack.push(Qt.resolvedUrl("Shutter.qml"))
 				}
 			}
-			
-			// Button {
-			// 	text: "Live View"
-			// 	visible: bridge.connected
-			// 	anchors.horizontalCenter: parent.horizontalCenter
-			// 	onClicked: {
-			// 		bridge.switchMode("rec")
-			// 		bridge.bindToEvents()
-			// 		pageStack.push(Qt.resolvedUrl("ImageList.qml"))
-			// 	}
-			// }
+
+			Button {
+				enabled: false
+				text: qsTr("Live View")
+				icon.source: "image://theme/icon-m-file-image"
+				visible: bridge.connected
+				anchors.horizontalCenter: parent.horizontalCenter
+				onClicked: {
+					bridge.switchMode("rec")
+					bridge.bindToEvents()
+					pageStack.push(Qt.resolvedUrl("ImageList.qml"))
+				}
+			}
 		}
 	}
 }
