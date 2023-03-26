@@ -100,9 +100,6 @@ WorkerScript.onMessage = function(m){
                         }
                     }
           )
-          console.debug(" data:", typeof(raw), raw.substr(0,8));
-          console.debug(" data:", typeof(data64), data64.substr(0,8));
-          console.debug(" data:", typeof(image), image.substr(0,8));
         } else if (r.status === 503) {
           WorkerScript.sendMessage({ event: "refused", query: query, message: r.status + ":" + r.statusText })
         } else {

@@ -46,6 +46,16 @@ Item { id: control
            return (DB.hasThumb(path) > 0)
        }
     }
+    Python { id: py
+        Component.onCompleted: {
+            //addImportPath(Qt.resolvedUrl('./'));
+            //addImportPath(Qt.resolvedUrl('../lib'));
+            addImportPath(Qt.resolvedUrl('../py'));
+            importModule("writer", [ ], function() {} ) }
+            function write(name, type, path, data) {
+                call("writer.writeImage", [ name, path, data ], function(){})
+            }
+    }
     WorkerScript { id: worker
         source: "js/worker.js"
         onMessage: function(m) {
@@ -53,7 +63,7 @@ Item { id: control
             if (m.event === "thumbReceived") {
                 //console.debug("got back:", m.data.substr(0,16));
                 storeThumb(m.name, m.type, m.data.url, m.path)
-                handleDownloadedFile(m.name, m.type, m.data, m.path)
+                handleDownloadedThumb(m.name, m.type, m.base64, m.path)
             }
             else if (m.event === "thumbUrl")      {}//setThumbUrl(m.image) }
             else if (m.event === "error")    {control.lastError += m.message }
@@ -200,6 +210,10 @@ Item { id: control
         }
         thumbCache.putThumb(JSON.stringify(t));
     }
+    function handleDownloadedThumb(name, type, data, path) {
+        py.writeImage(name, type, data, path)
+    }
+        /*
     function handleDownloadedFile(name, type, data, path) {
         //return
         console.debug("OK, filehandling:", name, type, data.length, typeof(data) );
@@ -221,6 +235,7 @@ Item { id: control
         //fi.url = path
         //console.debug("OK, file copied.", path, fi.size);
     }
+    */
 
     Timer{ id: dlqueue
         repeat: (qModel.count > 0 )
