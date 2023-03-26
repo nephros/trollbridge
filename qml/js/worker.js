@@ -82,14 +82,6 @@ WorkerScript.onMessage = function(m){
           // image URL
           const image = 'data:' + mime + ';base64,' + data64;
 
-          //console.debug("put back:", data.substr(0,16));
-          //WorkerScript.sendMessage({ event: "thumbUrl", image: image } )
-          // send back raw string:
-          //WorkerScript.sendMessage({ event: "thumbReceived", name: name, type: mime, data: raw, path: path } )
-          // send back base64 data:
-          //WorkerScript.sendMessage({ event: "thumbReceived", name: name, type: mime, data: data64, path: path } )
-          // send back image URL:
-          //WorkerScript.sendMessage({ event: "thumbReceived", name: name, type: mime, data: image, path: path } )
           // send back everything:
           WorkerScript.sendMessage({ event: "thumbReceived",
                       name: name, type: mime, path: path,
