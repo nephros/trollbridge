@@ -47,10 +47,10 @@ WorkerScript.onMessage = function(m){
     model.sync()
   }
   function addDownload() { curDownloads+=1
-    WorkerScript.sendMessage({ event: "queued" })
+    WorkerScript.sendMessage({ event: "queued",count: curDownloads })
   }
   function delDownload() { curDownloads-=1
-    WorkerScript.sendMessage({ event: "dequeued" })
+    WorkerScript.sendMessage({ event: "queued",count: curDownloads })
   }
 
   function xhrbin(url, name, path) {
@@ -80,15 +80,15 @@ WorkerScript.onMessage = function(m){
           // base64 string
           const data64 = base64Encode(raw);
           // image URL
-          const image = 'data:' + mime + ';base64,' + data64;
+          //const image = 'data:' + mime + ';base64,' + data64;
 
           // send back everything:
           WorkerScript.sendMessage({ event: "thumbReceived",
                       name: name, type: mime, path: path,
                         data: {
-                          raw: raw,
+                          //raw: raw,
                           base64: data64,
-                          url: image
+                          //url: image
                         }
                     }
           )

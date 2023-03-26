@@ -28,7 +28,7 @@ function reset() { resetDdefault() }
 
 
 function getDb() {
-    var db = LS.LocalStorage.openDatabaseSync("Storage", "0.1", "Persistent Storage", 20000);
+    var db = LS.LocalStorage.openDatabaseSync("Trollbridge Storage", "0.1", "Persistent Storage", 20000);
     if (!db_initialized) {
         db_initialized = true;
         initDb(db);
@@ -89,7 +89,7 @@ function putThumb(data){
     var db = getDb();
     try {
         db.transaction( function(tx) {
-            tx.executeSql('INSERT INTO Thumbnails VALUES(?)', [ data ]);
+            tx.executeSql('INSERT INTO Thumbnails VALUES(?)', [ data.path, data.url ]);
         })
     } catch (err) {
         console.warn("Error executing transaction: " + err);

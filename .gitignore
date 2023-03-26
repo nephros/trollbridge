@@ -4,3 +4,4 @@ translations/*.qm
 *.list
 Makefile
 icons/*x*
+__pycache__
