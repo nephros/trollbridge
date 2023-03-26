@@ -190,7 +190,7 @@ Page {
                 cache: true
                 smooth: !thumbDelegate.GridView.view.moving
                 fillMode: Image.PreserveAspectCrop
-                source: thumbnail ? thumbnail : trollPath
+                source: trollPath
             }
 
             Loader {

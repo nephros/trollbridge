@@ -1,10 +1,9 @@
 import QtQuick 2.1
-//import QtQuick.LocalStorage 2.0 as LS
 import Sailfish.Silica 1.0
 import Sailfish.Share 1.0
 import Nemo.FileManager 1.0
 import io.thp.pyotherside 1.5
-import "js/db.js" as DB
+//import "js/db.js" as DB
 //import "js/base64.js" as Base64
 
 Item { id: control
@@ -36,6 +35,7 @@ Item { id: control
      * helper types and stuff
      */
 
+    /*
     QtObject { id: thumbCache
        function putThumb(obj) {
            //DB.putThumb(obj)
@@ -47,6 +47,7 @@ Item { id: control
            return (DB.hasThumb(path) > 0)
        }
     }
+    */
     Python { id: py
         Component.onCompleted: {
             //addImportPath(Qt.resolvedUrl('./'));
@@ -116,6 +117,7 @@ Item { id: control
             path = path + "/" + dir
         })
     }
+    /*
     function storeThumb(name, type, url, path){
         var t = {
             path: path,
@@ -123,6 +125,7 @@ Item { id: control
         }
         thumbCache.putThumb(JSON.stringify(t));
     }
+    */
     function handleDownloadedThumb(name, type, data, path) {
         const url = 'data:' + type + ';base64,' + data;
         console.debug("writing:", url.substr(0,76), "...");
@@ -364,9 +367,11 @@ Item { id: control
                 //console.debug("file exists:", e["file"], e["size"], fi.size)
                 _list.append(e);
                 return
+                /*
             } else if (thumbCache.hasThumb(trollPath)){
                 e["thumbnail"] = thumbCache.getThump(trollPath);
                 _list.append(e);
+                */
             } else {
                if (FileEngine.exists(trollPath)) FileEngine.deleteFiles(trollPath);
                qModel.append(e)
