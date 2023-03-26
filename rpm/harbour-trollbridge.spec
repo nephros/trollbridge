@@ -18,6 +18,8 @@ Source0:    %{name}-%{version}.tar.gz
 Source100:  harbour-trollbridge.yaml
 Source101:  harbour-trollbridge-rpmlintrc
 Requires:   libsailfishapp-launcher
+Requires:   python3-base
+Requires:   python3dist(pycurl)
 BuildRequires:  qt5-qttools-linguist
 BuildRequires:  qt5-qmake
 BuildRequires:  sailfish-svg2png
@@ -42,11 +44,7 @@ Url:
   Homepage: %{url}
   Help: %{url}/discussions
   Bugtracker: %{url}/issues
-  Donations:
-    - https://noyb.eu/en/donations-other-support-options
-    - https://my.fsfe.org/donate
-    - https://supporters.eff.org/donate/join-4
-    - https://openrepos.net/donate
+  Donations: https://openrepos.net/donate
 %endif
 
 

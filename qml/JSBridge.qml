@@ -1,8 +1,8 @@
 import QtQuick 2.1
 import Sailfish.Silica 1.0
-import Sailfish.Share 1.0
 import Nemo.FileManager 1.0
 import io.thp.pyotherside 1.5
+//import Sailfish.Share 1.0
 //import "js/db.js" as DB
 //import "js/base64.js" as Base64
 
@@ -17,6 +17,7 @@ Item { id: control
     property string cachePath: StandardPaths.cache
     property bool err: false
     property var lastError: ["",]
+    property int numDownloads: 0 // rate limit, overwhelming the camera will lead to 503 errors
 
     /*
      * properties from trollbridge.go:
@@ -35,19 +36,7 @@ Item { id: control
      * helper types and stuff
      */
 
-    /*
-    QtObject { id: thumbCache
-       function putThumb(obj) {
-           //DB.putThumb(obj)
-       }
-       function getThumb(path) {
-           return DB.getThumb(path)
-       }
-       function hasThumb(path) {
-           return (DB.hasThumb(path) > 0)
-       }
-    }
-    */
+    // Simple script to store files because passing data from WScript to QML never works.
     Python { id: py
         Component.onCompleted: {
             //addImportPath(Qt.resolvedUrl('./'));
@@ -58,12 +47,15 @@ Item { id: control
                 call("writer.writeImage", [ data, path ], function(){})
             }
     }
+
+    // WS for mass downloads, and queued requests
     WorkerScript { id: worker
         source: "js/worker.js"
         onMessage: function(m) {
             if (m.event === "thumbReceived") {
-                handleDownloadedThumb(m.name, m.type, m.data.base64, m.path)
-            }
+                handleDownloadedImage(m.name, m.meta.type, m.data.base64, m.path) }
+            else if (m.event === "imgReceived") {
+                handleDownloadedImage(m.name, m.meta.type, m.data.base64, control.downloadPath + "/" + m.name) }
             else if (m.event === "error")    {control.lastError += m.message }
             else if (m.event === "refused")  {dlqueue.stop()}
             else if (m.event === "queued")   {control.numDownloads = m.count }
@@ -71,29 +63,24 @@ Item { id: control
         }
     }
     // file handling
-    property ShareAction sac: ShareAction{}
     property FileInfo fi: FileInfo{}
 
-    Connections {
-        target: FileEngine
-        onError: function(e,f) { console.warn("error:", e , f)}
-    }
-
     // queue for downloads, passed to worker:
-    property ListModel qModel: ListModel {}
-    property ListModel dlb: ListModel {}
-    property int numDownloads: 0
-    property int maxDownloads: 4
+    ListModel { id: qModel
+        property string mode: "thumb"; // switched to image mode later
+    }
     Timer{ id: dlqueue
         repeat: (qModel.count > 0 )
         interval: 1200
+        onRunningChanged: {
+            if (running) console.info("Starting download for %1 images (%2).".arg(qModel.count).arg(qModel.mode))
+        }
         onTriggered: {
             if (qModel.count <= 0){ stop(); console.info("queue empty"); return }
-            worker.sendMessage({ action: "download", parm: { model: qModel } })
+            worker.sendMessage({ action: "download", mode: qModel.mode, model: qModel })
         }
     }
 
-    //FROM https://cdnjs.cloudflare.com/ajax/libs/Base64/1.0.1/base64.js
     // assert all dl paths are there:
     onModelChanged: checkPaths()
     function checkPaths() {
@@ -117,19 +104,9 @@ Item { id: control
             path = path + "/" + dir
         })
     }
-    /*
-    function storeThumb(name, type, url, path){
-        var t = {
-            path: path,
-            url: url
-        }
-        thumbCache.putThumb(JSON.stringify(t));
-    }
-    */
-    function handleDownloadedThumb(name, type, data, path) {
-        const url = 'data:' + type + ';base64,' + data;
-        console.debug("writing:", url.substr(0,76), "...");
-        //storeThumb(name, type, url, path)
+
+    function handleDownloadedImage(name, type, data, path) {
+        //const url = 'data:' + type + ';base64,' + data;
         py.writeImage(data, path )
     }
 
@@ -159,8 +136,7 @@ Item { id: control
     }
     // SetSelection Set selection at list index
     //func (ctrl *BridgeControl) SetSelection(index string, value bool) {
-    function setSelection(index, value){
-        console.debug("called:",index,value)
+    function setSelection(index, value){ console.debug("called:",index,value)
         _list.setProperty(index, "selected", value)
     }
     // SetSelectionItem Set selection at list index
@@ -182,13 +158,18 @@ Item { id: control
     }
     // DownloadSelected Downloads all selected files
     //func (ctrl *BridgeControl) DownloadSelected(quarterSize bool) {
-    function downloadSelected(quarterSize) {
-        for (var i = 0; i < _list.length; i++) {
-            if (o[i].selected) {
-                o[i].downloading = true
-                download(i, quarterSize)
+    function downloadSelected(quarterSize) { console.debug("called.")
+        qModel.clear();
+        qModel.mode = (!!quarterSize) ? "imagesmall" : "image"
+        for (var i = 0; i < _list.count; i++) {
+            var o = _list.get(i);
+            if (o.selected) {
+                //o.downloading = true
+                _list.setProperty(i, "downloading" , true)
+                qModel.append(o);
             }
         }
+        dlqueue.start();
     }
     // UpdateItem Downloads the file at index
     //func (ctrl *BridgeControl) UpdateItem(idx int) {
@@ -197,7 +178,7 @@ Item { id: control
     }
     // SwitchMode Switch the camera mode to rec/play/shutter
     //func (ctrl *BridgeControl) SwitchMode(mode string) {
-    function switchMode(to) { console.debug("called.")
+    function switchMode(to) { console.info("Switching Camera into '%1' mode.".arg(to))
         // "play"
         // "rec"
         // "shutter"
@@ -272,33 +253,39 @@ Item { id: control
         fireQuery("", "get_imglist", [ "DIR=" + path, ], function(d) { handleImgList(d) } )
         console.debug("done.")
     }
+
+    /* ----- Unused functions ----- */
     // CameraGetFile Gets a file from camera
     //func (ctrl *BridgeControl) CameraGetFile(file string) (image.Image, error) {
     function cameraGetFile(file){
         fireQuery("", "get_thumbnail", [ "DIR=" + file] )
     }
+    /* ^^^^^ Unused functions ^^^^^ */
+
     // CameraDownloadFile Download a file from the camera
     //func (ctrl *BridgeControl) CameraDownloadFile(path string, file string, quarterSize bool) int64 { 
     //	downloadPath := config.DownloadPath + "/" + ctrl.Model
     function cameraDownloadFile(path , file , quarterSize) { 
         const dlPath = Qt.resolvedUrl(downloadPath + "/" + model)
         if (quarterSize) {
-           const parms = [ "DIR=" + path + "/" + file, "size=2048"]
-           fireQuery("", "get_resizeimg", parms)
+           fireQuery("", "get_resizeimg", [ "DIR=" + path + "/" + file, "size=2048"])
         } else {
-           const parms = [ path + "/" + file ]
-           fireQuery("file", path + "/" + file)
+           fireQuery("file", [ path + "/" + file ])
         }
     }
 
+    // send a web request to the camera - all except image downloads:
     function fireQuery(requestType , query , params, callback){
-       console.debug(requestType, " ", query, " ", params.join(" ") )
-       if (callback == null) (console.warn("no callback defined!") )
+       //console.debug(requestType, " ", query, " ", params.join(" ") )
+       if (typeof(callback) == undefined) {
+           console.debug("WARNING: no callback defined!")
+           callback = function() {};
+       }
 
         if (!requestType || requestType === "") requestType = "GET"
         const paramString = (params.length > 0) ? "?" + params.join("&") : ""
 
-        const xhr = new  XMLHttpRequest()
+        const xhr = new XMLHttpRequest()
         if (requestType === "file") {
             xhr.open("GET", config.hostaddr + query + paramString)
         } else {
@@ -309,26 +296,23 @@ Item { id: control
         xhr.send()
         xhr.onreadystatechange = function(event) {
             if (xhr.readyState == XMLHttpRequest.DONE) {
-                console.debug("REQ: done,", xhr.status, xhr.statusText)
-                if (xhr.status === 206) { // partial
+                //console.debug("fireQuery: done,", xhr.status, xhr.statusText)
+                if (xhr.status === 200) {
                     var rdata = xhr.response;
-                    callback(rdata)
-                } else if (xhr.status === 200) {
-                //} else if (xhr.status === 200 || xhr.status == 0) {
-                    var rdata = xhr.response;
-                    //console.debug("got:", rdata)
                     callback(rdata)
                 } else {
-                    console.debug("error in processing request.", query, xhr.status, xhr.statusText);
+                    console.warn("error in processing request.", query, xhr.status, xhr.statusText);
                     control.lastError = xhr.statusText;
                 }
             }
         }
     }
 
+    // populate the model with metadata, check for thumbnail existence, download if missing
     function handleImgList(data) {
         const d = data.split("\r\n")
         if (!d[0] === "VER_100") { console.debug("Prefix not correct"); return }
+        qModel.mode = "thumb";
         d.forEach(function(line) {
             if ((line === "") || (line === "VER_100")) return
             // example line: /DCIM/100OLYMP,PA010242.JPG,7051179,0,21825,29424
@@ -340,7 +324,7 @@ Item { id: control
             // TODO: make only once!
             mkdirpath(trollDir)
             const e = {}
-            // whats this for and why this value?
+            // what was this used for in original TrollBridge and why this value?
             //e["index"]       = rowData[1].substring(4,8) + fileType
             //e["index"]       = _list.count
             e["path"]        = rowData[0]
@@ -352,10 +336,9 @@ Item { id: control
             e["selected"  ]  = false
             e["downloaded"]  = false
             e["quarter"   ]  = false
-            //_list.append(e);
 
+            _list.append(e);
             fi.url = Qt.resolvedUrl(trollPath);
-            //fi.refresh();
             if (FileEngine.exists(trollPath)
                 && (fi.size!==0)
                 && (
@@ -363,29 +346,16 @@ Item { id: control
                     (fi.mimeType === "image/png")  ||
                     (fi.mimeType === "image/gif")
                 )
-            ) {
-                //console.debug("file exists:", e["file"], e["size"], fi.size)
-                _list.append(e);
+            ) { // exists and doesn't look corrupt
                 return
-                /*
-            } else if (thumbCache.hasThumb(trollPath)){
-                e["thumbnail"] = thumbCache.getThump(trollPath);
-                _list.append(e);
-                */
-            } else {
+            } else { // does not exist or looks corrupt:
                if (FileEngine.exists(trollPath)) FileEngine.deleteFiles(trollPath);
                qModel.append(e)
             }
         })
-        console.debug("found", _list.count + "/" + d.length, "entries, ", qModel.count, "missing thumbs")
-        dlqueue.start();
+        console.debug("found %1/%2 entries, %3 missing thumbs.".arg(_list.count).arg(d.length).arg(qModel.count));
+        if (qModel.count > 0) dlqueue.start();
     }
-
-    function  handleDownloadedData(name, type, data, path){
-    }
-
-
 }
 
 // vim: ft=javascript nu expandtab ts=4 sw=4 st=4
-

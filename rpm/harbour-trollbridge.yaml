@@ -24,16 +24,14 @@ Description: |
       Homepage: %{url}
       Help: %{url}/discussions
       Bugtracker: %{url}/issues
-      Donations:
-        - https://noyb.eu/en/donations-other-support-options
-        - https://my.fsfe.org/donate
-        - https://supporters.eff.org/donate/join-4
-        - https://openrepos.net/donate
+      Donations: https://openrepos.net/donate
     %endif
 
 BuildArch: noarch
 Requires:
     - libsailfishapp-launcher
+    - python3-base
+    - python3dist(pycurl)
 PkgBR:
     - qt5-qttools-linguist
     - qt5-qmake
