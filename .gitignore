@@ -5,3 +5,4 @@ translations/*.qm
 Makefile
 icons/*x*
 __pycache__
+build.log

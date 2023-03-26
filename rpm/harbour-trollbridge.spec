@@ -58,6 +58,7 @@ Url:
 # >> build pre
 # << build pre
 
+%qmake5 
 
 make %{?_smp_mflags}
 
@@ -68,7 +69,7 @@ make %{?_smp_mflags}
 rm -rf %{buildroot}
 # >> install pre
 # << install pre
-%make_install
+%qmake5_install
 
 # >> install post
 # << install post
@@ -83,7 +84,7 @@ desktop-file-install --delete-original       \
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/qml/*
 %{_datadir}/%{name}/translations/%{name}-*.qm
-#%{_datadir}/icons/hicolor/*/apps/%{name}.png
+%{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/hicolor/*/apps/%{name}.svg
 # >> files
 # << files
