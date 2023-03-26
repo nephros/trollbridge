@@ -223,22 +223,22 @@ Item { id: control
     // HalfWayToggle Toggle remote focusing
     //func (ctrl *BridgeControl) HalfWayToggle(press bool) {
     function halfWayToggle(press) {
-		if (press) {
-			cameraExecute("exec_shutter", "com=1stpush")
-		} else {
-			cameraExecute("exec_shutter", "com=1strelease")
-		}
-	}
+        if (press) {
+            cameraExecute("exec_shutter", "com=1stpush")
+        } else {
+            cameraExecute("exec_shutter", "com=1strelease")
+        }
+    }
     // Connect Connects to the Camera
     //func (ctrl *BridgeControl) Connect() {
     function connect() {
-		cameraGetValue("get_caminfo", "/caminfo/model", [], function(m) { setModel(m)} )
-		cameraGetValue("get_connectmode", "/connectmode", [], function(t) {setCameraType(t)})
-		if (type === "OPC") {
-			cameraExecute("switch_commpath", "path=wifi")
-			if (connected && !err) { switchMode("standalone") }
-			if (model === "") { cameraGetValue("get_caminfo", "/caminfo/model") }
-		}
+        cameraGetValue("get_caminfo", "/caminfo/model", [], function(m) { setModel(m)} )
+        cameraGetValue("get_connectmode", "/connectmode", [], function(t) {setCameraType(t)})
+        if (type === "OPC") {
+            cameraExecute("switch_commpath", "path=wifi")
+            if (connected && !err) { switchMode("standalone") }
+            if (model === "") { cameraGetValue("get_caminfo", "/caminfo/model") }
+        }
         //connected = true
     }
 
@@ -258,19 +258,18 @@ Item { id: control
     // GetFileList Check for files
     //func (ctrl *BridgeControl) GetFileList() {
     function getFileList() {
-    		cameraGetFolder("/DCIM/100OLYMP")
+        cameraGetFolder("/DCIM/100OLYMP")
     }
     // CameraGetValue Get a value from camera
     //func (ctrl *BridgeControl) CameraGetValue(query string, path string, params ...string) (string, error) {
     function cameraGetValue(query , xpath , params, cb ) {
-	    fireQuery("", query, params, cb )
+        fireQuery("", query, params, cb )
     }
 
     // CameraGetFolder Get file list from camera
     //func (ctrl *BridgeControl) CameraGetFolder(path string) error {
     function cameraGetFolder(path) {
-	    fireQuery("", "get_imglist", [ "DIR=" + path, ], function(d) { handleImgList(d) } )
-
+        fireQuery("", "get_imglist", [ "DIR=" + path, ], function(d) { handleImgList(d) } )
         console.debug("done.")
     }
     // CameraGetFile Gets a file from camera
@@ -294,6 +293,7 @@ Item { id: control
 
     function fireQuery(requestType , query , params, callback){
        console.debug(requestType, " ", query, " ", params.join(" ") )
+       if (callback == null) (console.warn("no callback defined!") )
 
         if (!requestType || requestType === "") requestType = "GET"
         const paramString = (params.length > 0) ? "?" + params.join("&") : ""
@@ -382,10 +382,6 @@ Item { id: control
     }
 
     function  handleDownloadedData(name, type, data, path){
-        var tmp = sac.writeContentToFile( { "name": name, "type": type, "data": data })
-        //console.debug("OK, file written.", tmp);
-        FileEngine.rename(tmp, path + "/" + name, true);
-        console.debug("OK, file copied.", path + "/"+ name);
     }
 
 
