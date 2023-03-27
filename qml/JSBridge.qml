@@ -36,6 +36,49 @@ Item { id: control
      * helper types and stuff
      */
 
+    // Simple script to store replace JS worker script:
+    Python { id: worker
+        signal queued
+        signal timeout
+        signal refused
+        signal error
+        signal dlModelChanged // necessary?
+        signal thumbReceived // necessary?
+        signal imgReceived   // necessary?
+        onQueued:  function(count)       {control.numDownloads = count }
+        onError:   function(message)     {control.lastError += m.message }
+        onRefused: function()            {dlqueue.stop()}
+        onDlModelChanged: function(model) {
+            control.qModel.clear()
+            model.forEatch(function(e) { control.qModel.append(e) })
+        }
+        // init
+        Component.onCompleted: {
+            addImportPath(Qt.resolvedUrl('../py'));
+            importModule("dl", [ ], function() {} )
+            setHandler('queued',  queued);
+            setHandler('timeout', timeout);
+            setHandler('refused', refused);
+            setHandler('error',   error);
+            //setHandler('thumbReceived', queued);
+            //setHandler('imgReceived'  , queued);
+        }
+        // calls
+        function setDownloadPath(path) {
+            call("dl.setDownloadPath", [path], null)
+        }
+        function download(mode, model) {
+            // FIXME: how to get a true listmodel in py?
+            var dllist = []
+            for (var i=0;i<model.count;i++){
+                dllist[dllist.length] = model.get(i)
+            }
+            call("dl.downloadList", [ mode, dllist ], function(){})
+        }
+        function mkpath(path)          { call("dl.assertPathExists", [ path ], function(){}) }
+    }
+
+
     // Simple script to store files because passing data from WScript to QML never works.
     Python { id: py
         Component.onCompleted: {
@@ -49,6 +92,7 @@ Item { id: control
     }
 
     // WS for mass downloads, and queued requests
+    /*
     WorkerScript { id: worker
         source: "js/worker.js"
         onMessage: function(m) {
@@ -62,6 +106,7 @@ Item { id: control
             else { console.warn("Unhandled message from worker:", m.event) }
         }
     }
+    */
     // file handling
     property FileInfo fi: FileInfo{}
 
@@ -77,12 +122,25 @@ Item { id: control
         }
         onTriggered: {
             if (qModel.count <= 0){ stop(); console.info("queue empty"); return }
-            worker.sendMessage({ action: "download", mode: qModel.mode, model: qModel })
+            //worker.sendMessage({ action: "download", mode: qModel.mode, model: qModel })
+            worker.download(qModel.mode, qModel)
         }
     }
 
     // assert all dl paths are there:
+    onDownloadPathChanged: {
+        worker.setDownloadPath(downloadPath)
+        worker.mkpath(downloadPath)
+    }
     onModelChanged: checkPaths()
+    function checkPaths() {
+        worker.mkpath(downloadPath + "/" + model)
+        worker.mkpath(cachePath    + "/" + model)
+    }
+    function mkdirpath(p) {
+        worker.mkpath(p);
+    }
+    /*
     function checkPaths() {
         if (!model || model === "" ) return
         if (!FileEngine.exists(downloadPath + "/" + model)) {
@@ -104,11 +162,14 @@ Item { id: control
             path = path + "/" + dir
         })
     }
+    */
 
+    /*
     function handleDownloadedImage(name, type, data, path) {
         //const url = 'data:' + type + ';base64,' + data;
         py.writeImage(data, path )
     }
+    */
 
     /*
      * functions from trollbridge.go:
