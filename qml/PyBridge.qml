@@ -2,9 +2,6 @@ import QtQuick 2.1
 import Sailfish.Silica 1.0
 import Nemo.FileManager 1.0
 import io.thp.pyotherside 1.5
-//import Sailfish.Share 1.0
-//import "js/db.js" as DB
-//import "js/base64.js" as Base64
 
 Item { id: control
 
@@ -36,60 +33,6 @@ Item { id: control
      * helper types and stuff
      */
 
-    // Simple script to store replace JS worker script:
-    Python { id: worker
-        signal queued
-        signal timeout
-        signal refused
-        signal error
-        signal dlModelChanged // necessary?
-        signal thumbReceived // necessary?
-        signal imgReceived   // necessary?
-        onQueued:  function(count)       {control.numDownloads = count }
-        onError:   function(message)     {control.lastError += m.message }
-        onRefused: function()            {dlqueue.stop()}
-        onDlModelChanged: function(model) {
-            control.qModel.clear()
-            model.forEatch(function(e) { control.qModel.append(e) })
-        }
-        // init
-        Component.onCompleted: {
-            addImportPath(Qt.resolvedUrl('../py'));
-            importModule("dl", [ ], function() {} )
-            setHandler('queued',  queued);
-            setHandler('timeout', timeout);
-            setHandler('refused', refused);
-            setHandler('error',   error);
-            //setHandler('thumbReceived', queued);
-            //setHandler('imgReceived'  , queued);
-        }
-        // calls
-        function setDownloadPath(path) {
-            call("dl.setDownloadPath", [path], null)
-        }
-        function download(mode, model) {
-            // FIXME: how to get a true listmodel in py?
-            var dllist = []
-            for (var i=0;i<model.count;i++){
-                dllist[dllist.length] = model.get(i)
-            }
-            call("dl.downloadList", [ mode, dllist ], function(){})
-        }
-        function mkpath(path)          { call("dl.assertPathExists", [ path ], function(){}) }
-    }
-
-
-    // Simple script to store files because passing data from WScript to QML never works.
-    Python { id: py
-        Component.onCompleted: {
-            //addImportPath(Qt.resolvedUrl('./'));
-            //addImportPath(Qt.resolvedUrl('../lib'));
-            addImportPath(Qt.resolvedUrl('../py'));
-            importModule("writer", [ ], function() {} ) }
-            function writeImage(data, path) {
-                call("writer.writeImage", [ data, path ], function(){})
-            }
-    }
     Python { id: ow
         Component.onCompleted: {
             //addImportPath(Qt.resolvedUrl('./'));
@@ -98,22 +41,6 @@ Item { id: control
             importModule("ow", [ ], function() {} ) }
     }
 
-    // WS for mass downloads, and queued requests
-    /*
-    WorkerScript { id: worker
-        source: "js/worker.js"
-        onMessage: function(m) {
-            if (m.event === "thumbReceived") {
-                handleDownloadedImage(m.name, m.meta.type, m.data.base64, m.path) }
-            else if (m.event === "imgReceived") {
-                handleDownloadedImage(m.name, m.meta.type, m.data.base64, control.downloadPath + "/" + m.name) }
-            else if (m.event === "error")    {control.lastError += m.message }
-            else if (m.event === "refused")  {dlqueue.stop()}
-            else if (m.event === "queued")   {control.numDownloads = m.count }
-            else { console.warn("Unhandled message from worker:", m.event) }
-        }
-    }
-    */
     // file handling
     property FileInfo fi: FileInfo{}
 
@@ -148,37 +75,6 @@ Item { id: control
         worker.mkpath(p);
     }
     /*
-    function checkPaths() {
-        if (!model || model === "" ) return
-        if (!FileEngine.exists(downloadPath + "/" + model)) {
-            mkdirpath(downloadPath + "/" + model)
-        }
-        if (!FileEngine.exists(cachePath + model)) {
-            mkdirpath(cachePath + "/" + model)
-        }
-    }
-    function mkdirpath(p) {
-        //console.debug("asserting path exists:", p)
-        const dirs = p.split("/");
-        const path = "/"
-        dirs.forEach(function(dir) {
-            if (!FileEngine.exists(path + "/" + dir)) {
-                FileEngine.mkdir(path, dir, true)
-                console.debug("made:", dir)
-            }
-            path = path + "/" + dir
-        })
-    }
-    */
-
-    /*
-    function handleDownloadedImage(name, type, data, path) {
-        //const url = 'data:' + type + ';base64,' + data;
-        py.writeImage(data, path )
-    }
-    */
-
-    /*
      * functions from trollbridge.go:
      */
 
@@ -187,15 +83,15 @@ Item { id: control
 
     // SwitchState Switch the camera on or off
     function switchState(on) {
-		if (on) {
-			cameraExecute("exec_pwon", "")
-		} else {
-			cameraExecute("exec_pwoff", "")
-		}
+        if (on) {
+            cameraExecute("exec_pwon", "")
+        } else {
+            cameraExecute("exec_pwoff", "")
+        }
     }
     // CameraExecute Fire GET request to camera
-	function cameraExecute(cmd, path){console.debug("called:", cmd, path)
-	    fireQuery("", cmd, [path], function(r){console.debug(r)} )
+    function cameraExecute(cmd, path){console.debug("called:", cmd, path)
+        fireQuery("", cmd, [path], function(r){console.debug(r)} )
     }
     // GetImage Get image at list index
     //func (ctrl *BridgeControl) GetImage(index int) *File {
@@ -332,7 +228,7 @@ Item { id: control
 
     // CameraDownloadFile Download a file from the camera
     //func (ctrl *BridgeControl) CameraDownloadFile(path string, file string, quarterSize bool) int64 { 
-    //	downloadPath := config.DownloadPath + "/" + ctrl.Model
+    //  downloadPath := config.DownloadPath + "/" + ctrl.Model
     function cameraDownloadFile(path , file , quarterSize) { 
         const dlPath = Qt.resolvedUrl(downloadPath + "/" + model)
         if (quarterSize) {
