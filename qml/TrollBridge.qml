@@ -74,7 +74,7 @@ Page {
 
 			SecondaryButton {
 				text: "Shutter"
-				icon.source: "image://theme/icon-m-cover-camera"
+				icon.source: "image://theme/icon-cover-camera"
 				visible: bridge.connected && !bridge.opc
 				anchors.horizontalCenter: parent.horizontalCenter
 				onClicked: {
