@@ -20,6 +20,7 @@ Source101:  harbour-trollbridge-rpmlintrc
 Requires:   libsailfishapp-launcher
 Requires:   python3-base
 Requires:   python3dist(pycurl)
+Requires:   python3dist(olympuswifi)
 BuildRequires:  qt5-qttools-linguist
 BuildRequires:  qt5-qmake
 BuildRequires:  sailfish-svg2png

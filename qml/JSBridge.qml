@@ -90,6 +90,13 @@ Item { id: control
                 call("writer.writeImage", [ data, path ], function(){})
             }
     }
+    Python { id: ow
+        Component.onCompleted: {
+            //addImportPath(Qt.resolvedUrl('./'));
+            //addImportPath(Qt.resolvedUrl('../lib'));
+            addImportPath(Qt.resolvedUrl('../py'));
+            importModule("ow", [ ], function() {} ) }
+    }
 
     // WS for mass downloads, and queued requests
     /*

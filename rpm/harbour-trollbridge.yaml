@@ -32,6 +32,7 @@ Requires:
     - libsailfishapp-launcher
     - python3-base
     - python3dist(pycurl)
+    - python3dist(olympuswifi)
 PkgBR:
     - qt5-qttools-linguist
     - qt5-qmake
