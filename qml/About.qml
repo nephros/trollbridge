@@ -32,7 +32,7 @@ Page {
 				The name of the application was chosen in memory of Terry Pratchett, who died on March 12th, 2015.<br>\
 				Thie original application has been build using GO language and QML bindings.<br>\
 				(C)2016 Bundyo, released under the MIT license.<br>\
-				Rewritten to replace GO with pure QML and JavaScript by nephros<br>\
+				Rewritten to replace GO with pure QML and Python by nephros<br>\
 				(C)2023 nephros, released under the MIT license.")
 				anchors.horizontalCenter: parent.horizontalCenter
 				wrapMode: Text.WrapAtWordBoundaryOrAnywhere
@@ -45,6 +45,16 @@ Page {
 				text: qsTr("Additional Copyright")
 			}
 
+			Label {
+				text: qsTr("<a href='https://github.com/joergmlpts/olympus-wifi/'>olympus-wifi Python module</a> (C) joergmlpts.")
+				anchors.horizontalCenter: parent.horizontalCenter
+				wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+				width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
+				verticalAlignment: Text.AlignVCenter
+				horizontalAlignment: Text.AlignLeft
+				linkColor: "lightsteelblue"
+				x: Theme.paddingLarge
+			}
 			Label {
 				text: qsTr("<a href='https://together.jolla.com/question/105098/how-to-setup-go-142-15-16-runtime-and-go-qml-pkg-for-mersdk/'>GO-QML port to sailfish OS</a> (C) Nekron.")
 				anchors.horizontalCenter: parent.horizontalCenter
