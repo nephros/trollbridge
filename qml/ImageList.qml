@@ -204,14 +204,14 @@ Page {
 
             Loader {
                 anchors.centerIn: parent
-                visible: downloading || thumbImage.status == Image.Loading
+                visible: (downloading && !downloaded) || thumbImage.status == Image.Loading
                 sourceComponent: thumbBusy
 
                 Component {
                     id: thumbBusy
 
                     BusyIndicator {
-                        running: true
+                        running: visible
                         visible: !downloading
                     }
                 }
