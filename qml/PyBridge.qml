@@ -250,27 +250,6 @@ Item { id: control
         console.debug("done.")
     }
 
-    /* ----- Unused functions ----- */
-    // CameraGetFile Gets a file from camera
-    //func (ctrl *BridgeControl) CameraGetFile(file string) (image.Image, error) {
-    function cameraGetFile(file){
-        //fireQuery("", "get_thumbnail", [ "DIR=" + file] )
-        ow.call("", "getThumbnail", [ file ] )
-    }
-    /* ^^^^^ Unused functions ^^^^^ */
-
-    // CameraDownloadFile Download a file from the camera
-    //func (ctrl *BridgeControl) CameraDownloadFile(path string, file string, quarterSize bool) int64 { 
-    //  downloadPath := config.DownloadPath + "/" + ctrl.Model
-    function cameraDownloadFile(path , file , quarterSize) {
-        const dlPath = Qt.resolvedUrl(downloadPath + "/" + model)
-        if (quarterSize) {
-           fireQuery("", "get_resizeimg", [ "DIR=" + path + "/" + file, "size=2048"])
-        } else {
-           fireQuery("file", [ path + "/" + file ])
-        }
-    }
-
     // send a web request to the camera - all except image downloads:
     function fireQuery(requestType , query , params, callback){
        console.debug("FIXME: fireQuery calld", requestType,  query,  params.join(" ") )
