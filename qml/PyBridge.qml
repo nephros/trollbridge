@@ -24,6 +24,7 @@ Item { id: control
     //property string downloadPath: StandardPaths.pictures + "/" + Qt.application.name
     property string downloadPath: StandardPaths.pictures + "/Olympus" // legacy
     property string model: ""
+    property int free
     property string type: ""
     property bool connected: mainWindow.online && (!!model && (model !== ""))
     property bool downloading: false
@@ -34,45 +35,41 @@ Item { id: control
      */
 
     Python { id: ow
+        property bool initialized: false
+
+        signal error
+        onError:   function(message)     {control.lastError += m.message }
+
+        function dlDone(index){
+            console.info("Downloaded", index)
+            _list.setProperty(index, "downloaded", true)
+        }
         Component.onCompleted: {
-            //addImportPath(Qt.resolvedUrl('./'));
-            //addImportPath(Qt.resolvedUrl('../lib'));
+            setHandler('error', error);
+            setHandler('thumb', dlDone);
+            setHandler('downloaded', dlDone);
             addImportPath(Qt.resolvedUrl('../py'));
-            importModule("ow", [ ], function() {} ) }
+            importModule("ow", [ ], function() {
+                call('ow.info', [ ], function() {})
+            } )
+        }
     }
 
     // file handling
     property FileInfo fi: FileInfo{}
 
-    // queue for downloads, passed to worker:
-    ListModel { id: qModel
-        property string mode: "thumb"; // switched to image mode later
-    }
-    Timer{ id: dlqueue
-        repeat: (qModel.count > 0 )
-        interval: 1200
-        onRunningChanged: {
-            if (running) console.info("Starting download for %1 images (%2).".arg(qModel.count).arg(qModel.mode))
-        }
-        onTriggered: {
-            if (qModel.count <= 0){ stop(); console.info("queue empty"); return }
-            //worker.sendMessage({ action: "download", mode: qModel.mode, model: qModel })
-            worker.download(qModel.mode, qModel)
-        }
-    }
-
     // assert all dl paths are there:
     onDownloadPathChanged: {
-        worker.setDownloadPath(downloadPath)
-        worker.mkpath(downloadPath)
+        //worker.setDownloadPath(downloadPath)
+        //worker.mkpath(downloadPath)
     }
     onModelChanged: checkPaths()
     function checkPaths() {
-        worker.mkpath(downloadPath + "/" + model)
-        worker.mkpath(cachePath    + "/" + model)
+        //worker.mkpath(downloadPath + "/" + model)
+        //worker.mkpath(cachePath    + "/" + model)
     }
     function mkdirpath(p) {
-        worker.mkpath(p);
+        //worker.mkpath(p);
     }
     /*
      * functions from trollbridge.go:
@@ -118,40 +115,45 @@ Item { id: control
     // Download Downloads the file at index
     //func (ctrl *BridgeControl) Download(idx int, quarterSize bool) {
     function download(idx , quarterSize) {
-        cameraDownloadFile(_list.get(idx).path, _list.get(idx).file, quarterSize)
+        //cameraDownloadFile(_list.get(idx).path, _list.get(idx).file, quarterSize)
+        ow.call('ow.downloadImage', [ _list.get(idx).path, _list.get(idx).file, idx, quarterSize ])
     }
     // DownloadSelected Downloads all selected files
     //func (ctrl *BridgeControl) DownloadSelected(quarterSize bool) {
     function downloadSelected(quarterSize) { console.debug("called.")
-        qModel.clear();
-        qModel.mode = (!!quarterSize) ? "imagesmall" : "image"
         for (var i = 0; i < _list.count; i++) {
             var o = _list.get(i);
             if (o.selected) {
-                //o.downloading = true
                 _list.setProperty(i, "downloading" , true)
-                qModel.append(o);
+                const path = o["path"] + "/" + o["file"]
+                const out = downloadPath + "/" + control.model + "/" + o["file"]
+                ow.call('ow.downloadImage', [ path, out, i, quarterSize])
             }
         }
-        dlqueue.start();
     }
     // UpdateItem Downloads the file at index
     //func (ctrl *BridgeControl) UpdateItem(idx int) {
     function updateItem(idx) {console.debug("called.")
         // probably unneeded
+        var o = _list.get(i);
+        _list.setProperty(i, "downloading" , true)
+        const path = o["path"] + "/" + o["file"]
+        const out = downloadPath + "/" + control.model + "/" + o["file"]
+        ow.call('ow.downloadImage', [ path, out, i, false])
     }
     // SwitchMode Switch the camera mode to rec/play/shutter
     //func (ctrl *BridgeControl) SwitchMode(mode string) {
-    function switchMode(to) { console.info("Switching Camera into '%1' mode.".arg(to))
+    function switchMode(to) {
+        console.info("Switching Camera into '%1' mode.".arg(to))
         // "play"
         // "rec"
         // "shutter"
         // "standalone"
         if (opc) {
             if (to === "shutter")
-            cameraExecute("switch_cameramode", "mode=" + "rec")
+            ow.call('ow.sendCommand', [ "switch_cameramode", { "mode": to } ])
         } else {
-            cameraExecute("switch_cammode", "mode=" + to)
+            ow.call('ow.sendCommand', [ "switch_cammode", { "mode": to } ])
         }
     }
     // ShutterToggle Toggle the remote shutter
@@ -159,9 +161,9 @@ Item { id: control
     function shutterToggle(press) {
         if (press) {
             if (opc) {
-                cameraExecute("exec_takemotion", "com=newstarttake")
+                ow.call('ow.sendCommand', [ "exec_takemotion", { "com": "newstarttake" } ])
             } else {
-                cameraExecute("exec_shutter", "com=1st2ndpush")
+                ow.call('ow.sendCommand', [ "exec_shutter", { "com": "1st2ndpush" } ])
             }
         }
     }
@@ -169,36 +171,30 @@ Item { id: control
     //func (ctrl *BridgeControl) HalfWayToggle(press bool) {
     function halfWayToggle(press) {
         if (press) {
-            cameraExecute("exec_shutter", "com=1stpush")
+            ow.call('ow.sendCommand', [ "exec_shutter", { "com": "1stpush" } ])
         } else {
-            cameraExecute("exec_shutter", "com=1strelease")
+            ow.call('ow.sendCommand', [ "exec_shutter", { "com": "1strelease" } ])
         }
     }
     // Connect Connects to the Camera
     //func (ctrl *BridgeControl) Connect() {
     function connect() {
-        cameraGetValue("get_caminfo", "/caminfo/model", [], function(m) { setModel(m)} )
-        cameraGetValue("get_connectmode", "/connectmode", [], function(t) {setCameraType(t)})
-        if (type === "OPC") {
-            cameraExecute("switch_commpath", "path=wifi")
-            if (connected && !err) { switchMode("standalone") }
-            if (model === "") { cameraGetValue("get_caminfo", "/caminfo/model") }
-        }
-        //connected = true
+        //cameraGetValue("get_caminfo", "/caminfo/model", [], function(m) { setModel(m)} )
+        ow.call("ow.getCameraModel", [], function(m) { setModel(m["model"])} )
+        ow.call("ow.getFreeSpace", [], function(s) { setSpace(s["unused"]) })
+        ow.call("ow.info");
+        connected = true
     }
 
     // SetModel BridgeControl Model setter 
     //func (ctrl *BridgeControl) SetModel(model string) {
     function setModel(m) {
-        const re = /<model>([^<]+)<\/model>/
-        model = m.match(re)[1]
+        model = m
         console.log(model)
     }
+    function setSpace(s) { free = s }
     function setCameraType(t) {
-        const re = /<connectmode>([^<]+)<\/connectmode>/
-        type = t.match(re)[1]
-        console.log(type)
-        //TODO: should change "connected" 
+        type = t
     }
     // GetFileList Check for files
     //func (ctrl *BridgeControl) GetFileList() {
@@ -214,7 +210,43 @@ Item { id: control
     // CameraGetFolder Get file list from camera
     //func (ctrl *BridgeControl) CameraGetFolder(path string) error {
     function cameraGetFolder(path) {
-        fireQuery("", "get_imglist", [ "DIR=" + path, ], function(d) { handleImgList(d) } )
+        //fireQuery("", "get_imglist", [ "DIR=" + path, ], function(d) { handleImgList(d) } )
+        ow.call('ow.listImages', [ path ], function(l) {
+            var d = JSON.parse(l)
+            for (var i=0; i<d.length; i++) {
+                const e = {}
+                // what was this used for in original TrollBridge and why this value?
+                //e["index"]       = rowData[1].substring(4,8) + fileType
+                //e["index"]       = _list.count
+                var spl = d[i]["file_name"].split("/")
+                const fileName  = spl.pop()
+                const filePath  = spl.join("/")
+                const trollDir  = cachePath + "/" + model + filePath
+                const trollPath  = trollDir + "/" + fileName
+
+                e["file"]        = fileName
+                e["path"]        = filePath
+                e["trollPath"]   = trollPath
+                e["type"]        = FileEngine.extensionForFileName(fileName)
+                e["size"]        = d["file_size"]
+                e["downloading"] = false
+                e["selected"  ]  = false
+                e["downloaded"]  = false
+                e["quarter"   ]  = false
+
+                const wanted = downloadPath + "/" + control.model + "/" + e["file"]
+                if (FileEngine.exists(wanted)) {
+                    console.log("exists:", wanted)
+                    e["downloaded"]  = true
+                }
+                if (!FileEngine.exists(trollPath)) {
+                    console.debug("Does not exist:" , trollPath)
+                    ow.call('ow.getThumbnail', [d[i]["file_name"],trollPath] )
+                }
+                console.debug("model element:", JSON.stringify(e))
+                _list.append(e)
+            }
+        })
         console.debug("done.")
     }
 
@@ -222,14 +254,15 @@ Item { id: control
     // CameraGetFile Gets a file from camera
     //func (ctrl *BridgeControl) CameraGetFile(file string) (image.Image, error) {
     function cameraGetFile(file){
-        fireQuery("", "get_thumbnail", [ "DIR=" + file] )
+        //fireQuery("", "get_thumbnail", [ "DIR=" + file] )
+        ow.call("", "getThumbnail", [ file ] )
     }
     /* ^^^^^ Unused functions ^^^^^ */
 
     // CameraDownloadFile Download a file from the camera
     //func (ctrl *BridgeControl) CameraDownloadFile(path string, file string, quarterSize bool) int64 { 
     //  downloadPath := config.DownloadPath + "/" + ctrl.Model
-    function cameraDownloadFile(path , file , quarterSize) { 
+    function cameraDownloadFile(path , file , quarterSize) {
         const dlPath = Qt.resolvedUrl(downloadPath + "/" + model)
         if (quarterSize) {
            fireQuery("", "get_resizeimg", [ "DIR=" + path + "/" + file, "size=2048"])
@@ -240,86 +273,7 @@ Item { id: control
 
     // send a web request to the camera - all except image downloads:
     function fireQuery(requestType , query , params, callback){
-       //console.debug(requestType, " ", query, " ", params.join(" ") )
-       if (typeof(callback) == undefined) {
-           console.debug("WARNING: no callback defined!")
-           callback = function() {};
-       }
-
-        if (!requestType || requestType === "") requestType = "GET"
-        const paramString = (params.length > 0) ? "?" + params.join("&") : ""
-
-        const xhr = new XMLHttpRequest()
-        if (requestType === "file") {
-            xhr.open("GET", config.hostaddr + query + paramString)
-        } else {
-            xhr.open(requestType, config.hostaddr + query + ".cgi" + paramString)
-        }
-        xhr.setRequestHeader("User-Agent", config.agent)
-        xhr.setRequestHeader("Host", config.host)
-        xhr.send()
-        xhr.onreadystatechange = function(event) {
-            if (xhr.readyState == XMLHttpRequest.DONE) {
-                //console.debug("fireQuery: done,", xhr.status, xhr.statusText)
-                if (xhr.status === 200) {
-                    var rdata = xhr.response;
-                    callback(rdata)
-                } else {
-                    console.warn("error in processing request.", query, xhr.status, xhr.statusText);
-                    control.lastError = xhr.statusText;
-                }
-            }
-        }
-    }
-
-    // populate the model with metadata, check for thumbnail existence, download if missing
-    function handleImgList(data) {
-        const d = data.split("\r\n")
-        if (!d[0] === "VER_100") { console.debug("Prefix not correct"); return }
-        qModel.mode = "thumb";
-        d.forEach(function(line) {
-            if ((line === "") || (line === "VER_100")) return
-            // example line: /DCIM/100OLYMP,PA010242.JPG,7051179,0,21825,29424
-            //               path          ,filename    ,size   ,?,?????,?????
-            const rowData = line.split(",")
-            const fileType = rowData[1].split(".")[1]
-            const trollDir  = cachePath + "/" + model + rowData[0]
-            const trollPath  = trollDir + "/" + rowData[1]
-            // TODO: make only once!
-            mkdirpath(trollDir)
-            const e = {}
-            // what was this used for in original TrollBridge and why this value?
-            //e["index"]       = rowData[1].substring(4,8) + fileType
-            //e["index"]       = _list.count
-            e["path"]        = rowData[0]
-            e["file"]        = rowData[1]
-            e["trollPath"]   = trollPath
-            e["type"]        = fileType
-            e["size"]        = Number(rowData[2])
-            e["downloading"] = false
-            e["selected"  ]  = false
-            e["downloaded"]  = false
-            e["quarter"   ]  = false
-
-            _list.append(e);
-            fi.url = Qt.resolvedUrl(trollPath);
-            if (FileEngine.exists(trollPath)
-                && (fi.size!==0)
-                && (
-                    (fi.mimeType === "image/jpeg") ||
-                    (fi.mimeType === "image/png")  ||
-                    (fi.mimeType === "image/gif")
-                )
-            ) { // exists and doesn't look corrupt
-                return
-            } else { // does not exist or looks corrupt:
-               if (FileEngine.exists(trollPath)) FileEngine.deleteFiles(trollPath);
-               qModel.append(e)
-            }
-        })
-        console.debug("found %1/%2 entries, %3 missing thumbs.".arg(_list.count).arg(d.length).arg(qModel.count));
-        if (qModel.count > 0) dlqueue.start();
+       console.debug("FIXME: fireQuery calld", requestType,  query,  params.join(" ") )
     }
 }
-
 // vim: ft=javascript nu expandtab ts=4 sw=4 st=4
