@@ -144,8 +144,8 @@ Page {
         }
 
         header: PageHeader {
-                title: (imageList.mode !== "" ? imageList.mode : "Images")
-                description: (imageList.mode !== "" ? "from " : "on ") + bridge.model
+            title: (imageList.mode !== "" ? imageList.mode : "Images")
+            description: (imageList.mode !== "" ? "from " : "on ") + bridge.model + " " + qsTr("free: %1").arg(Format.formatFileSize(bridge.free))
         }
         /*
         header: Column {
