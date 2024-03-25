@@ -44,14 +44,17 @@ Item { id: control
             console.info("Downloaded", index)
             _list.setProperty(index, "downloaded", true)
         }
+
         Component.onCompleted: {
             setHandler('error', error);
             setHandler('thumb', dlDone);
             setHandler('downloaded', dlDone);
             addImportPath(Qt.resolvedUrl('../py'));
+        }
+        function connect() {
             importModule("ow", [ ], function() {
                 call('ow.info', [ ], function() {})
-            } )
+            })
         }
     }
 
@@ -180,9 +183,9 @@ Item { id: control
     //func (ctrl *BridgeControl) Connect() {
     function connect() {
         //cameraGetValue("get_caminfo", "/caminfo/model", [], function(m) { setModel(m)} )
+        ow.connect()
         ow.call("ow.getCameraModel", [], function(m) { setModel(m["model"])} )
         ow.call("ow.getFreeSpace", [], function(s) { setSpace(s["unused"]) })
-        ow.call("ow.info");
         connected = true
     }
 
