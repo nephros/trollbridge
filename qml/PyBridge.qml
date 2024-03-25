@@ -67,19 +67,7 @@ Item { id: control
     // file handling
     property FileInfo fi: FileInfo{}
 
-    // assert all dl paths are there:
-    onDownloadPathChanged: {
-        //worker.setDownloadPath(downloadPath)
-        //worker.mkpath(downloadPath)
-    }
-    onModelChanged: checkPaths()
-    function checkPaths() {
-        //worker.mkpath(downloadPath + "/" + model)
-        //worker.mkpath(cachePath    + "/" + model)
-    }
-    function mkdirpath(p) {
-        //worker.mkpath(p);
-    }
+
     /*
      * functions from trollbridge.go:
      */
@@ -232,6 +220,7 @@ Item { id: control
     function cameraGetFolder(path) {
         //fireQuery("", "get_imglist", [ "DIR=" + path, ], function(d) { handleImgList(d) } )
         ow.call('ow.listImages', [ path ], function(l) {
+            _list.clear()
             var d = JSON.parse(l)
             for (var i=0; i<d.length; i++) {
                 const e = {}

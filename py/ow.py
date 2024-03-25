@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 import os
+from pathlib import Path
 import json
 import pprint
 #import collections
@@ -66,6 +67,7 @@ def getFreeSpace():
     return camera.xml_query('get_unusedcapacity')
 
 def writeImage (data , path):
+    os.makedirs(Path(path).parent, mode=0o755, exist_ok=True)
     with open(path, 'wb') as f:
         f.write(data)
 

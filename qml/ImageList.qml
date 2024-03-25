@@ -74,7 +74,7 @@ Page {
                     pdMain.action = "main";
                     pdMain.subAction = function () {
                         bridge.downloadSelected(true);
-                    } 
+                    }
                 }
             }
 
@@ -106,6 +106,12 @@ Page {
                         thumbGridView.forceLayout();
                     }
                 }
+            }
+        }
+        PushUpMenu {
+            MenuItem {
+                text: qsTr("Slideshow")
+                onClicked: pageStack.push(Qt.resolvedUrl("Slideshow.qml"), { "model": photoModel } )
             }
         }
 
