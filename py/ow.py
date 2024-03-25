@@ -28,7 +28,7 @@ def getThumbnail(path, out):
     print("Want thumb from", path, "to", out)
     data = camera.download_thumbnail(path)
     writeImage (data , out)
-    pyotherside.send("thumb")
+    pyotherside.send("thumbdownloaded")
 
 def downloadImage( path, out, index, small):
     if small:
@@ -39,7 +39,7 @@ def downloadImage( path, out, index, small):
         print("Want image from", path, "to", out)
         data = camera.download_image(path)
         writeImage (data , out)
-    pyotherside.send("downloaded", index)
+    pyotherside.send("downloaded", index, small)
 
 def sendCommand(cmd, args):
     print("Command: ", cmd, "args", args)

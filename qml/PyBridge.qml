@@ -40,17 +40,20 @@ Item { id: control
         signal error
         onError:   function(message)     {control.lastError += m.message }
 
-        function dlDone(index){
+        // message handlers
+        function dlDone(index, quarter){
             console.info("Downloaded", index)
             _list.setProperty(index, "downloaded", true)
+            _list.setProperty(index, "quarter", quarter)
         }
 
         Component.onCompleted: {
             setHandler('error', error);
-            setHandler('thumb', dlDone);
+            setHandler('thumbdownloaded', dlDone);
             setHandler('downloaded', dlDone);
             addImportPath(Qt.resolvedUrl('../py'));
         }
+        // functions
         function connect() {
             importModule("ow", [ ], function() {
                 call('ow.info', [ ], function() {})
