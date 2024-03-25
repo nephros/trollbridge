@@ -84,6 +84,7 @@ desktop-file-install --delete-original       \
 %{_datadir}/applications/*.desktop
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/qml/*
+%{_datadir}/%{name}/py/*
 %{_datadir}/%{name}/translations/%{name}-*.qm
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/hicolor/*/apps/%{name}.svg

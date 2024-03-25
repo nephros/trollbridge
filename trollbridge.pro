@@ -11,6 +11,11 @@ SOURCES += \
 TRANSLATIONS += translations/$${TARGET}-en.ts \
                 translations/$${TARGET}-de.ts \
 
+PYTHON_FILES += $$files(py/*.py)
+python.files = $${PYTHON_FILES}
+python.path = $$PREFIX/share/$${TARGET}/py
+INSTALLS += python
+
 desktop.files = $${TARGET}.desktop
 desktop.path = $$PREFIX/share/applications
 INSTALLS += desktop
