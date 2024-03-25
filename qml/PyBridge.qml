@@ -188,10 +188,11 @@ Item { id: control
     // Connect Connects to the Camera
     //func (ctrl *BridgeControl) Connect() {
     function connect() {
-        //cameraGetValue("get_caminfo", "/caminfo/model", [], function(m) { setModel(m)} )
         ow.connect()
         ow.call("ow.getCameraModel", [], function(m) { setModel(m["model"])} )
         ow.call("ow.getFreeSpace", [], function(s) { setSpace(s["unused"]) })
+        ow.call('ow.sendCommand', [ "get_connectmode" ], function(t) {setCameraType(t)})
+
         connected = true
     }
 
