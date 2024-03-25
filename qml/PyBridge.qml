@@ -90,9 +90,9 @@ Item { id: control
     // SwitchState Switch the camera on or off
     function switchState(on) {
         if (on) {
-            cameraExecute("exec_pwon", "")
+            ow.call("ow.sendCommand",  [ "exec_pwon"] )
         } else {
-            cameraExecute("exec_pwoff", "")
+            ow.call("ow.sendCommand",  [ "exec_pwoff"] )
         }
     }
     // CameraExecute Fire GET request to camera
