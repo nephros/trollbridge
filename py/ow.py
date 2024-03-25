@@ -70,3 +70,11 @@ def writeImage (data , path):
         f.write(data)
 
 camera = OlympusCamera()
+
+def image_provider(req_id, req_size):
+    data = camera.send_command('get_resizeimg', DIR=req_id, size='1024').content
+    return bytearray(data), (1024, 1024), pyotherside.format_data
+
+pyotherside.set_image_provider(image_provider)
+
+
