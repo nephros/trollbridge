@@ -73,7 +73,7 @@ Page {
                 x: Theme.paddingLarge
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignLeft
-                linkColor: "lightsteelblue"
+                linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
             }
 
             SectionHeader {
@@ -87,7 +87,7 @@ Page {
                 width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignLeft
-                linkColor: "lightsteelblue"
+                linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
                 x: Theme.paddingLarge
             }
             Label {
@@ -97,7 +97,7 @@ Page {
                 width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignLeft
-                linkColor: "lightsteelblue"
+                linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
                 x: Theme.paddingLarge
             }
             Label {
@@ -107,7 +107,7 @@ Page {
                 width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignLeft
-                linkColor: "lightsteelblue"
+                linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
                 x: Theme.paddingLarge
             }
             Label {
@@ -117,7 +117,7 @@ Page {
                 width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
                 verticalAlignment: Text.AlignVCenter
                 horizontalAlignment: Text.AlignLeft
-                linkColor: "lightsteelblue"
+                linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
                 x: Theme.paddingLarge
             }
 
