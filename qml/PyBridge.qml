@@ -84,6 +84,9 @@ Item { id: control
     //function runtimeVersion(){ return "QtQuick 2.1" }
     function version() { return Qt.application.version }
 
+    function setTime() {
+        ow.call("ow.setClock")
+    }
     // SwitchState Switch the camera on or off
     function switchState(on) {
         if (on) {
