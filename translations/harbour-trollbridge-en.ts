@@ -93,30 +93,118 @@
     </message>
     <message>
         <location filename="../qml/ImageList.qml" line="113"/>
+        <source>Slideshow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/ImageList.qml" line="119"/>
         <source>Photos</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/ImageList.qml" line="114"/>
+        <location filename="../qml/ImageList.qml" line="120"/>
         <source>free: %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/ImageList.qml" line="114"/>
+        <location filename="../qml/ImageList.qml" line="120"/>
         <source>from %1</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/ImageList.qml" line="114"/>
+        <location filename="../qml/ImageList.qml" line="120"/>
         <source>on %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>LiveView</name>
+    <message>
+        <location filename="../qml/LiveView.qml" line="36"/>
+        <source>Live View</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/LiveView.qml" line="90"/>
+        <source>Play/Pause</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/LiveView.qml" line="93"/>
+        <source>Take Picture</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/LiveView.qml" line="100"/>
+        <source>Stop LiveView</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>Setup</name>
     <message>
-        <location filename="../qml/Setup.qml" line="30"/>
+        <location filename="../qml/Setup.qml" line="25"/>
         <source>Camera Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="27"/>
+        <source>UTC Time Difference</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="37"/>
+        <source>Take Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="38"/>
+        <source>Drive Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="39"/>
+        <source>Focal Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="40"/>
+        <source>Exposure Compensation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="41"/>
+        <source>Shutter Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="42"/>
+        <source>ISO Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="43"/>
+        <source>White Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="44"/>
+        <source>Art Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="45"/>
+        <source>Color Tone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="46"/>
+        <source>Color Phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="47"/>
+        <source>Movie Exposure</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -129,9 +217,32 @@
     </message>
 </context>
 <context>
+    <name>Slideshow</name>
+    <message>
+        <location filename="../qml/Slideshow.qml" line="16"/>
+        <source>Slideshow</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Slideshow.qml" line="21"/>
+        <source>Select for download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Slideshow.qml" line="22"/>
+        <source>Unselect for download</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Slideshow.qml" line="30"/>
+        <source>(selected)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>TrollBridge</name>
     <message>
-        <location filename="../qml/TrollBridge.qml" line="27"/>
+        <location filename="../qml/TrollBridge.qml" line="28"/>
         <source>Power Off</source>
         <translation type="unfinished"></translation>
     </message>
@@ -146,32 +257,32 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/TrollBridge.qml" line="50"/>
+        <location filename="../qml/TrollBridge.qml" line="51"/>
         <source>not connected</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/TrollBridge.qml" line="58"/>
+        <location filename="../qml/TrollBridge.qml" line="71"/>
         <source>Please connect the camera Wi-Fi</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/TrollBridge.qml" line="64"/>
+        <location filename="../qml/TrollBridge.qml" line="77"/>
         <source>Photos</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/TrollBridge.qml" line="76"/>
+        <location filename="../qml/TrollBridge.qml" line="89"/>
         <source>Shutter</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/TrollBridge.qml" line="88"/>
+        <location filename="../qml/TrollBridge.qml" line="100"/>
         <source>Live View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/TrollBridge.qml" line="100"/>
+        <location filename="../qml/TrollBridge.qml" line="111"/>
         <source>Setup</source>
         <translation type="unfinished"></translation>
     </message>
