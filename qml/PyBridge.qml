@@ -6,15 +6,9 @@ import io.thp.pyotherside 1.5
 Item { id: control
 
     // my properties:
-    property var config: {
-        "host": "192.168.0.10",
-        "hostaddr": "http://192.168.0.10/",
-        "agent": "OlympusCameraKit",
-    }
     property string cachePath: StandardPaths.cache
     property bool err: false
     property var lastError: ["",]
-    property int numDownloads: 0 // rate limit, overwhelming the camera will lead to 503 errors
 
     /*
      * properties from trollbridge.go:
@@ -34,8 +28,9 @@ Item { id: control
     property var liveParms: []
     property string liveAddr: "192.168.0.10"
     property int livePort: 40000
-    //property string liveUrl: "udp://" + liveAddr + ":" + livePort
-    property string liveUrl: "rtp://" + liveAddr + ":" + livePort
+    //property string liveUrl: "udp://" + liveAddr + ":" + livePort + "/"
+    property string liveUrl: "rtp://" + liveAddr + ":" + livePort + "/"
+
     /*
      * helper types and stuff
      */
@@ -70,7 +65,6 @@ Item { id: control
     // file handling
     property FileInfo fi: FileInfo{}
 
-
     /*
      * functions from trollbridge.go:
      */
@@ -78,9 +72,6 @@ Item { id: control
     //function runtimeVersion(){ return "QtQuick 2.1" }
     function version() { return Qt.application.version }
 
-    function setTime() {
-        ow.call("ow.setClock")
-    }
     // SwitchState Switch the camera on or off
     function switchState(on) {
         if (on) {
@@ -89,10 +80,7 @@ Item { id: control
             ow.call("ow.sendCommand",  [ "exec_pwoff"] )
         }
     }
-    // CameraExecute Fire GET request to camera
-    function cameraExecute(cmd, path){console.debug("called:", cmd, path)
-        fireQuery("", cmd, [path], function(r){console.debug(r)} )
-    }
+
     // GetImage Get image at list index
     //func (ctrl *BridgeControl) GetImage(index int) *File {
     function getImage(index) {console.debug("called.")
@@ -205,12 +193,10 @@ Item { id: control
     function getFileList() {
         cameraGetFolder("/DCIM/100OLYMP")
     }
-    // CameraGetValue Get a value from camera
-    //func (ctrl *BridgeControl) CameraGetValue(query string, path string, params ...string) (string, error) {
-    function cameraGetValue(query , xpath , params, cb ) {
-        fireQuery("", query, params, cb )
-    }
 
+    function setTime() {
+        ow.call("ow.setClock")
+    }
     function startLiveView() {
         // fixme: don't use fixed quality
         console.debug("Starting LiveView")
@@ -224,7 +210,6 @@ Item { id: control
     // CameraGetFolder Get file list from camera
     //func (ctrl *BridgeControl) CameraGetFolder(path string) error {
     function cameraGetFolder(path) {
-        //fireQuery("", "get_imglist", [ "DIR=" + path, ], function(d) { handleImgList(d) } )
         ow.call('ow.listImages', [ path ], function(l) {
             _list.clear()
             var d = JSON.parse(l)
@@ -265,9 +250,5 @@ Item { id: control
         console.debug("done.")
     }
 
-    // send a web request to the camera - all except image downloads:
-    function fireQuery(requestType , query , params, callback){
-       console.debug("FIXME: fireQuery calld", requestType,  query,  params.join(" ") )
-    }
 }
 // vim: ft=javascript nu expandtab ts=4 sw=4 st=4
