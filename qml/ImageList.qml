@@ -14,41 +14,7 @@ Page {
         }
     }
 
-    //background: ColorBackground { color: "black" }
-
     property ListModel photoModel: bridge._list
-    /*
-    ListModel {
-        id: photoModel
-        objectName: "photoModel"
-
-        property var addItem: null
-        onAddItemChanged: {
-            if (addItem !== null) {
-                this.append(addItem);
-            }
-        }
-
-        property var item: null
-        property var setIndex: null
-        onSetIndexChanged: {
-            if (setIndex !== null && item !== null) {
-                console.log("setIndex: " + item.index, item.downloading, item.downloaded)
-                this.set(findInModel(setIndex), item);
-                item = null;
-                setIndex = null;
-            }
-        }
-
-        function findInModel(idx) {
-            for (var i = 0, len = photoModel.count; i < len; i++) {
-                if (photoModel.get(i).index === idx) {
-                    return i;
-                }
-            }
-        }
-    }
-    */
 
     SilicaGridView {
         id: thumbGridView
