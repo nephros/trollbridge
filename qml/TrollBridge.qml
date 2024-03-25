@@ -108,7 +108,7 @@ Page {
 
             SecondaryButton {
                 text: qsTr("Setup")
-                icon.source: "image://theme/icon-m-settings"
+                icon.source: "image://theme/icon-m-setting"
                 visible: bridge.connected
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
