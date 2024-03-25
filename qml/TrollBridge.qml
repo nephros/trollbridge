@@ -9,11 +9,11 @@ Page {
         PullDownMenu {
             id: pullDownMenu
             MenuItem {
-                text: qsTr("About Troll Bridge")
+                text: qsTr("About %1").arg("Troll Bridge")
                 onClicked: pageStack.push(Qt.resolvedUrl("About.qml"))
             }
             MenuItem {
-                text: qsTr("Connect to WiFi...")
+                text: qsTr("Connect to Wi-Fi...")
                 onClicked: wifi.connect()
             }
             busy: bridge.connected ? false : (!mainWindow.connected)
@@ -35,7 +35,7 @@ Page {
             id: column
             spacing: Theme.paddingLarge
             width: parent.width
-            PageHeader { title: qsTr("Troll Bridge") }
+            PageHeader { title: "Troll Bridge" }
             Image {
                 height: Theme.itemSizeMedium
                 sourceSize.height: height
@@ -47,7 +47,7 @@ Page {
             }
             Label {
                 objectName: "modelLabel"
-                text: bridge.model
+                text: bridge.connected ? bridge.model : qsTr("not connected")
                 anchors.horizontalCenter: parent.horizontalCenter
                 color: mainWindow.palette.highlightColor
                 font.pixelSize: Theme.fontSizeLarge
@@ -55,13 +55,13 @@ Page {
             }
 
             Label {
-                text: "Please connect the camera WiFi"
+                text: qsTr("Please connect the camera Wi-Fi")
                 visible: !bridge.connected
                 anchors.horizontalCenter: parent.horizontalCenter
             }
 
             Button {
-                text: "Images"
+                text: qsTr("Photos")
                 icon.source: "image://theme/icon-m-file-image"
                 visible: bridge.connected
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -73,7 +73,7 @@ Page {
             }
 
             SecondaryButton {
-                text: "Shutter"
+                text: qsTr("Shutter")
                 icon.source: "image://theme/icon-cover-camera"
                 visible: bridge.connected && !bridge.opc
                 anchors.horizontalCenter: parent.horizontalCenter

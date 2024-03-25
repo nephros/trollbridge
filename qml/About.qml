@@ -14,9 +14,7 @@ Page {
             id: col
             spacing: Theme.paddingLarge
             width: parent.width
-            PageHeader {
-                title: qsTr("About Troll Bridge")
-            }
+            PageHeader { title: qsTr("About %1").arg("Troll Bridge") }
 
             Image {
                 anchors.horizontalCenter: parent.horizontalCenter
@@ -93,7 +91,7 @@ Page {
                 x: Theme.paddingLarge
             }
             Label {
-                text: qsTr("<a href='https://together.jolla.com/question/105098/how-to-setup-go-142-15-16-runtime-and-go-qml-pkg-for-mersdk/'>GO-QML port to sailfish OS</a> © Nekron.")
+                text: qsTr("<a href='https://together.jolla.com/question/105098/how-to-setup-go-142-15-16-runtime-and-go-qml-pkg-for-mersdk/'>GO-QML port to Sailfish OS</a> © Nekron.")
                 anchors.horizontalCenter: parent.horizontalCenter
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
                 width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
