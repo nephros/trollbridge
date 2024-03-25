@@ -56,6 +56,9 @@ def getProperty(name):
 def getCameraModel():
     return camera.get_camera_info()
 
+def setClock():
+    camera.set_clock()
+
 def getFreeSpace():
     #ret = camera.send_command('get_unusedcapacity').content
     ret = camera.xml_query('get_unusedcapacity')

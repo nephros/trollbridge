@@ -95,6 +95,16 @@ Page {
                     pageStack.push(Qt.resolvedUrl("ImageList.qml"))
                 }
             }
+
+            SecondaryButton {
+                text: qsTr("Setup")
+                icon.source: "image://theme/icon-m-settings"
+                visible: bridge.connected
+                anchors.horizontalCenter: parent.horizontalCenter
+                onClicked: {
+                    pageStack.push(Qt.resolvedUrl("Setup.qml"))
+                }
+            }
         }
     }
 }

@@ -67,34 +67,57 @@
 <context>
     <name>ImageList</name>
     <message>
-        <location filename="../qml/ImageList.qml" line="76"/>
+        <location filename="../qml/ImageList.qml" line="42"/>
         <source>Select and DELETE!</source>
         <translation>Auswählen und Löschen!</translation>
     </message>
     <message>
-        <location filename="../qml/ImageList.qml" line="85"/>
+        <location filename="../qml/ImageList.qml" line="51"/>
         <source>Select and Download</source>
         <translation>Auswählen und herunterladen</translation>
     </message>
     <message>
-        <location filename="../qml/ImageList.qml" line="95"/>
+        <location filename="../qml/ImageList.qml" line="61"/>
         <source>DELETE All Selected!</source>
         <translation>Alles ausgewählte LOSCHEN!</translation>
     </message>
     <message>
-        <location filename="../qml/ImageList.qml" line="106"/>
+        <location filename="../qml/ImageList.qml" line="72"/>
         <source>Download Selected Quarter Sized</source>
         <translation>Auswählen und herunterladen (¼ Größe)</translation>
     </message>
     <message>
-        <location filename="../qml/ImageList.qml" line="119"/>
+        <location filename="../qml/ImageList.qml" line="85"/>
         <source>Download Selected</source>
         <translation>Ausgewählte herunterladen</translation>
     </message>
     <message>
-        <location filename="../qml/ImageList.qml" line="148"/>
+        <location filename="../qml/ImageList.qml" line="113"/>
+        <source>Photos</source>
+        <translation>Fotos</translation>
+    </message>
+    <message>
+        <location filename="../qml/ImageList.qml" line="114"/>
         <source>free: %1</source>
         <translation>frei: %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/ImageList.qml" line="114"/>
+        <source>from %1</source>
+        <translation>von %1</translation>
+    </message>
+    <message>
+        <location filename="../qml/ImageList.qml" line="114"/>
+        <source>on %1</source>
+        <translation>auf %1</translation>
+    </message>
+</context>
+<context>
+    <name>Setup</name>
+    <message>
+        <location filename="../qml/Setup.qml" line="30"/>
+        <source>Camera Setup</source>
+        <translation>Kamerakonfiguration</translation>
     </message>
 </context>
 <context>
@@ -146,6 +169,11 @@
         <location filename="../qml/TrollBridge.qml" line="88"/>
         <source>Live View</source>
         <translation>Live-Ansicht</translation>
+    </message>
+    <message>
+        <location filename="../qml/TrollBridge.qml" line="100"/>
+        <source>Setup</source>
+        <translation>Konfiguration</translation>
     </message>
 </context>
 </TS>
