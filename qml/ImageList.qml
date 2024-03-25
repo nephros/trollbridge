@@ -110,8 +110,8 @@ Page {
         }
 
         header: PageHeader {
-            title: (imageList.mode !== "" ? imageList.mode : "Images")
-            description: (imageList.mode !== "" ? "from " : "on ") + bridge.model + " " + qsTr("free: %1").arg(Format.formatFileSize(bridge.free))
+            title: (imageList.mode !== "" ? imageList.mode : qsTr("Photos"))
+            description: (imageList.mode !== "" ? qsTr("from %1").arg(bridge.model) : qsTr("on %1").arg(bridge.model)) + " " + qsTr("free: %1").arg(Format.formatFileSize(bridge.free))
         }
         delegate: Rectangle {
             id: thumbDelegate
