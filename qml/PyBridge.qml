@@ -29,6 +29,9 @@ Item { id: control
     property bool connected: mainWindow.online && (!!model && (model !== ""))
     property bool downloading: false
     property bool opc: (type === "OPC")
+    property bool live: false
+    property alias liveAddr: config.host
+    property bool livePort: 40000
 
     /*
      * helper types and stuff
@@ -203,9 +206,9 @@ Item { id: control
         console.log(model)
     }
     function setSpace(s) { free = s }
-    function setCameraType(t) {
-        type = t
-    }
+    function setCameraType(t) { type = t; console.info("Connection Type:", t)}
+    function setLive(l) { live = l }
+
     // GetFileList Check for files
     //func (ctrl *BridgeControl) GetFileList() {
     function getFileList() {
@@ -215,6 +218,13 @@ Item { id: control
     //func (ctrl *BridgeControl) CameraGetValue(query string, path string, params ...string) (string, error) {
     function cameraGetValue(query , xpath , params, cb ) {
         fireQuery("", query, params, cb )
+    }
+
+    function startLiveView() {
+        ow.call("ow.camera.start_liveview", [{ "port": control.livePort }], function(res) { setLive(true) })
+    }
+    function stopLiveView() {
+        ow.call("ow.camera.stop_liveview", [], function(res) { setLive(false) })
     }
 
     // CameraGetFolder Get file list from camera
