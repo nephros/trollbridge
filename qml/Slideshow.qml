@@ -6,35 +6,49 @@ import Sailfish.Gallery 1.0
 Page { id: root
 
     property ListModel model
-    backgroundColor: olygray
+    backgroundColor: "#808080"
 
-    PageHeader { id: head
-        title: qsTr("Slideshow")
-    }
-
-    SlideshowView {
-        id: view
-
-        onCurrentIndexChanged: {
-            if (currentIndex >= 0) {
-            var o = model.get(currentIndex)
-            head.description = o["file"]
-            }
-        }
+    SilicaFlickable {
         anchors.fill: parent
-        anchors.centerIn: parent
-        height: parent.height - head.height
-        itemWidth: width //- Theme.horizontalPageMargin
+        contentHeight: view.height
 
-        model: root.model
+        PageHeader { id: head
+            title: qsTr("Slideshow")
+        }
 
-        delegate: ImageViewer {
-            width: view.itemWidth
-            height: view.height
-            property string remote: "image://python/" + path + "/" + file
-            property string local: bridge.downloadPath + "/" + bridge.model + "/" + file
-            photo.source: trollPath
-            largePhoto.source: (downloaded && FileEngine.exists(local)) ? local : remote
+        PullDownMenu {
+            enabled: !view.dragging && !view.flicking
+            MenuItem { text: qsTr("Select for download");    onClicked: bridge.setSelection(view.currentIndex, true); visible: !view.currentItem.isSelected }
+            MenuItem { text: qsTr("Unselect for download");  onClicked: bridge.setSelection(view.currentIndex, false); visible: view.currentItem.isSelected }
+        }
+
+        SlideshowView {
+            id: view
+
+            function updateHeader() {
+                var o = model.get(currentIndex)
+                head.description = o["file"] + (currentItem.isSelected ? " " + qsTr("(selected)") : "")
+            }
+
+            onCurrentIndexChanged: updateHeader()
+            Component.onCompleted: updateHeader()
+
+            //anchors.fill: parent
+            anchors.centerIn: parent
+            height: root.height - head.height
+            itemWidth: width //- Theme.horizontalPageMargin
+
+            model: root.model
+
+            delegate: ImageViewer {
+                property bool isSelected: selected
+                width: view.itemWidth
+                height: view.height
+                property string remote: "image://python/" + path + "/" + file
+                property string local: bridge.downloadPath + "/" + bridge.model + "/" + file
+                photo.source: trollPath
+                largePhoto.source: (downloaded && FileEngine.exists(local)) ? local : remote
+            }
         }
     }
 }
