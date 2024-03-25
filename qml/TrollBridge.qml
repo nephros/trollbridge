@@ -96,15 +96,13 @@ Page {
             }
 
             Button {
-                enabled: false
                 text: qsTr("Live View")
                 icon.source: "image://theme/icon-m-file-image"
                 visible: bridge.connected
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
                     bridge.switchMode("rec")
-                    bridge.bindToEvents()
-                    pageStack.push(Qt.resolvedUrl("ImageList.qml"), { "photoModel": null })
+                    pageStack.push(Qt.resolvedUrl("LiveView.qml"))
                 }
             }
 
