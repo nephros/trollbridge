@@ -113,42 +113,6 @@ Page {
             title: (imageList.mode !== "" ? imageList.mode : "Images")
             description: (imageList.mode !== "" ? "from " : "on ") + bridge.model + " " + qsTr("free: %1").arg(Format.formatFileSize(bridge.free))
         }
-        /*
-        header: Column {
-            id: customHeader
-
-            width: ( parent.width - ( 2.0 * Theme.paddingLarge ))
-            //height: 110
-            spacing: 0
-            x: Theme.paddingLarge
-
-            // Aargh!
-            Rectangle { height: Theme.paddingMedium; width: parent.width; color: "transparent" }
-
-            Label {
-                id: firstHeader
-                width: parent.width
-                height: Theme.fontSizeExtraLarge
-
-                text: (imageList.mode !== "" ? imageList.mode : "Images")
-                font.pixelSize: Theme.fontSizeLarge
-                color: mainWindow.palette.highlightColor
-                horizontalAlignment: Text.AlignRight
-            }
-
-            Label {
-                id: subHeader
-                width: parent.width
-
-                text: (imageList.mode !== "" ? "from " : "on ") + bridge.model
-                font.pixelSize: Theme.fontSizeMedium
-                color: mainWindow.palette.secondaryHighlightColor
-                horizontalAlignment: Text.AlignRight
-            }
-        }
-        */
-
-        //delegate: Item {
         delegate: Rectangle {
             id: thumbDelegate
 
