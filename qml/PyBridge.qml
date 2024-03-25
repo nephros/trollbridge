@@ -29,10 +29,13 @@ Item { id: control
     property bool connected: mainWindow.online && (!!model && (model !== ""))
     property bool downloading: false
     property bool opc: (type === "OPC")
-    property bool live: false
-    property alias liveAddr: config.host
-    property bool livePort: 40000
 
+    property bool live: false
+    property var liveParms: []
+    property string liveAddr: "192.168.0.10"
+    property int livePort: 40000
+    //property string liveUrl: "udp://" + liveAddr + ":" + livePort
+    property string liveUrl: "rtp://" + liveAddr + ":" + livePort
     /*
      * helper types and stuff
      */
@@ -195,7 +198,7 @@ Item { id: control
     function setSpace(s) { free = s }
     function setCameraType(t) { type = t; console.info("Connection Type:", t)}
 
-    function setLive(l) { live = l }
+    function setLive(l, parms) { live = l; liveParms = parms }
 
     // GetFileList Check for files
     //func (ctrl *BridgeControl) GetFileList() {
@@ -209,7 +212,10 @@ Item { id: control
     }
 
     function startLiveView() {
-        ow.call("ow.camera.start_liveview", [{ "port": control.livePort }], function(res) { setLive(true) })
+        // fixme: don't use fixed quality
+        console.debug("Starting LiveView")
+        //ow.call("ow.camera.start_liveview", [ control.livePort , "0800x0600" ], function(res) { setLive(true); console.debug(JSON.stringify(res)) })
+        ow.call("ow.camera.start_liveview", [ control.livePort , "0640x0480" ], function(res) { setLive(true, res); console.debug(JSON.stringify(res)) })
     }
     function stopLiveView() {
         ow.call("ow.camera.stop_liveview", [], function(res) { setLive(false) })

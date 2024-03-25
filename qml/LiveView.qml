@@ -1,29 +1,79 @@
 import QtQuick 2.0
+import QtMultimedia 5.6
 import Sailfish.Silica 1.0
+import Sailfish.Gallery 1.0
 
 Page {
     id: livePage
 
     onStatusChanged: {
         if (status == PageStatus.Deactivating && _navigation == PageNavigation.Back) {
+             bridge.stopLiveView()
              bridge.switchMode(bridge.opc ? "standalone" : "play")
+        }
+        if (status == PageStatus.Active) {
+             bridge.startLiveView()
         }
     }
 
+    Connections {
+        target: bridge
+        onLiveChanged: {
+            console.debug("Live status changed:", bridge.live)
+            if (bridge.live) {
+                content.source = bridge.liveUrl
+                content.play()
+            } else {
+                content.pause()
+                content.source = ""
+            }
+        }
+    }
     SilicaFlickable {
         anchors.fill: parent
-        contentHeight: content.height + Theme.paddingLarge
+        contentHeight: content.height + Theme.paddingLarge + header.height
 
-        PageHeader { title: qsTr("Live View") }
+        PageHeader { id: header; title: qsTr("Live View") }
 
-        Rectangle { content
-            width: parent.width - Theme.paddingLarge
-            height: parent.width - Theme.paddingLarge
+        Video { id: content
+            anchors.top: header.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            width:  800 + Theme.paddingLarge
+            height: 600 + Theme.paddingLarge
+            muted: true
+            autoPlay: false
+            autoLoad: true
+            onPlaybackStateChanged: console.info("Now Playing", playbackState)
+            onStatusChanged: console.debug(content.status)
+            onSourceChanged: console.debug(source)
+            onBufferProgressChanged: console.debug(bufferProgress)
+        }
+        /*
+        VideoPoster { id: content
+            anchors.top: header.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            width:  800 + Theme.paddingLarge
+            height: 600 + Theme.paddingLarge
+            onLoadedChanged: console.debug(loaded)
+            onBusyChanged:   console.debug(busy)
+            onStatusChanged: console.debug(content.status)
+            onSourceChanged: console.debug(content.source)
+            function play() {playing = true}
+            function pause() {togglePlay()}
+        }
+        */
+        /*
+        Rectangle { id: content
+            anchors.top: header.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            color: "gray"
+            width:  800 + Theme.paddingLarge
+            height: 600 + Theme.paddingLarge
+
 
             MediaPlayer { id: player
-                autoPlay: true
                 muted: true
-                source: bridge.live ? "udp://" + bridge.liveAddr + ":" + bridge.livePort : ""
+                onPlaybackStateChanged: console.info("Now Playing", playbackState)
             }
 
             VideoOutput { id: video
@@ -32,6 +82,22 @@ Page {
                 focus : visible // to receive focus and capture key events when visible
                 fillMode: VideoOutput.Stretch
             }
+        }
+        */
+        ButtonLayout {
+            anchors.top: content.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            Button { text: qsTr("Play/Pause")
+                onClicked: content.play()
+            }
+            Button { text: qsTr("Take Picture")
+                onPressedChanged: { 
+                    if (!pressed) {
+                        bridge.ow.call("ow.camera.take_picture", [], function(res) { setLive(false) })
+                    }
+                }
+            }
+            Button { text: qsTr("Stop LiveView"); onClicked: bridge.stopLiveView() }
         }
 
         //ValueButton { label: qsTr("Take Mode")            ; value: ""; onClicked: {} }

@@ -22,6 +22,7 @@ Page {
         PushUpMenu {
             id: pushUpMenu
             enabled: bridge.connected
+            visible: enabled
             MenuItem {
                 objectName: "cameraSwitch"
                 text: qsTr("Power Off")
