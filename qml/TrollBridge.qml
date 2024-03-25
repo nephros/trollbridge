@@ -53,7 +53,19 @@ Page {
                 font.pixelSize: Theme.fontSizeLarge
                 font.family: Theme.fontFamilyHeading
             }
-
+            Loader {
+                anchors.horizontalCenter: parent.horizontalCenter
+                active: !!bridge.model
+                sourceComponent: Image {
+                    height: Theme.iconSizeLarge
+                    sourceSize.height: height
+                    fillMode: Image.PreserveAspectFit
+                    source: {
+                        if (/^E-M/.test(bridge.model)) return "devices/olympus-om-d.png"
+                        return ""
+                    }
+                }
+            }
             Label {
                 text: qsTr("Please connect the camera Wi-Fi")
                 visible: !bridge.connected
