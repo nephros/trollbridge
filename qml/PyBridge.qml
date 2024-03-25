@@ -192,21 +192,21 @@ Item { id: control
     //func (ctrl *BridgeControl) Connect() {
     function connect() {
         ow.connect()
+        ow.call('ow.info', [ ], function() {})
         ow.call("ow.getCameraModel", [], function(m) { setModel(m["model"])} )
         ow.call("ow.getFreeSpace", [], function(s) { setSpace(s["unused"]) })
-        ow.call('ow.sendCommand', [ "get_connectmode" ], function(t) {setCameraType(t)})
+        //ow.call('ow.sendCommand', [ "get_connectmode", {} ], function(t) {setCameraType(t)})
+        ow.call("ow.getConnectMode", [], function(t) {setCameraType(t["connectmode"])})
 
         connected = true
     }
 
     // SetModel BridgeControl Model setter 
     //func (ctrl *BridgeControl) SetModel(model string) {
-    function setModel(m) {
-        model = m
-        console.log(model)
-    }
+    function setModel(m) { model = m; console.info("Model:", model) }
     function setSpace(s) { free = s }
     function setCameraType(t) { type = t; console.info("Connection Type:", t)}
+
     function setLive(l) { live = l }
 
     // GetFileList Check for files

@@ -56,13 +56,14 @@ def getProperty(name):
 def getCameraModel():
     return camera.get_camera_info()
 
+def getConnectMode():
+    return camera.xml_query("get_connectmode")
+
 def setClock():
     camera.set_clock()
 
 def getFreeSpace():
-    #ret = camera.send_command('get_unusedcapacity').content
-    ret = camera.xml_query('get_unusedcapacity')
-    return ret
+    return camera.xml_query('get_unusedcapacity')
 
 def writeImage (data , path):
     with open(path, 'wb') as f:
