@@ -253,7 +253,7 @@ Item { id: control
                     console.debug("Does not exist:" , trollPath)
                     ow.call('ow.getThumbnail', [d[i]["file_name"],trollPath] )
                 }
-                console.debug("model element:", JSON.stringify(e))
+                //console.debug("model element:", JSON.stringify(e))
                 _list.append(e)
             }
         })
