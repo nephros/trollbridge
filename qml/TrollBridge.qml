@@ -80,7 +80,7 @@ Page {
                 onClicked: {
                     bridge.switchMode("play")
                     bridge.getFileList()
-                    pageStack.push(Qt.resolvedUrl("ImageList.qml"))
+                    pageStack.push(Qt.resolvedUrl("ImageList.qml"), { "photoModel": bridge._list })
                 }
             }
 
@@ -104,7 +104,7 @@ Page {
                 onClicked: {
                     bridge.switchMode("rec")
                     bridge.bindToEvents()
-                    pageStack.push(Qt.resolvedUrl("ImageList.qml"))
+                    pageStack.push(Qt.resolvedUrl("ImageList.qml"), { "photoModel": null })
                 }
             }
 

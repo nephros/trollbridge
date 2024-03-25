@@ -14,7 +14,7 @@ Page {
         }
     }
 
-    property alias photoModel: bridge._list
+    property ListModel photoModel
 
     SilicaGridView {
         id: thumbGridView
