@@ -100,9 +100,9 @@ Item { id: control
     // SwitchState Switch the camera on or off
     function switchState(on) {
         if (on) {
-            ow.call("ow.sendCommand",  [ "exec_pwon"] )
+            ow.call("ow.sendCommand",  [ "exec_pwon", {} ] )
         } else {
-            ow.call("ow.sendCommand",  [ "exec_pwoff"] )
+            ow.call("ow.sendCommand",  [ "exec_pwoff", {} ] )
         }
     }
 
