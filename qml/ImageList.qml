@@ -135,7 +135,12 @@ Page {
                 cache: true
                 smooth: !thumbDelegate.GridView.view.moving
                 fillMode: Image.PreserveAspectCrop
-                source: trollPath
+                source: trollPath ? trollPath : "image://theme/icon-m-image"
+                onStatusChanged: {
+                    if (thumbImage.status == Image.Error) {
+                        source = "image://theme/icon-m-image"
+                    }
+                }
             }
 
             Loader {
