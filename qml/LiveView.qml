@@ -8,6 +8,7 @@ Page {
 
     onStatusChanged: {
         if (status == PageStatus.Deactivating && _navigation == PageNavigation.Back) {
+             content.source = ""
              bridge.stopLiveView()
              bridge.switchMode(bridge.opc ? "standalone" : "play")
         }
@@ -21,12 +22,22 @@ Page {
         onLiveChanged: {
             console.debug("Live status changed:", bridge.live)
             if (bridge.live) {
-                content.source = bridge.liveUrl
-                content.play()
+                //content.source = bridge.liveUrl
+                //content.play()
+                delay.restart()
             } else {
                 content.pause()
                 content.source = ""
+                delay.stop()
             }
+        }
+    }
+    Timer { id: delay
+        interval: 1000
+        running: false
+        onTriggered: {
+            content.source = bridge.liveUrl
+            content.play()
         }
     }
     SilicaFlickable {
