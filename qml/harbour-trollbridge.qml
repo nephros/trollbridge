@@ -33,6 +33,34 @@ ApplicationWindow {
     palette.highlightBackgroundColor: Theme.highlightBackgroundFromColor(olyyellow, Theme.colorScheme)
     palette.highlightDimmerColor: Theme.highlightDimmerFromColor(olyyellow, Theme.colorScheme) 
 
+    readonly property var propertyMap: {
+        // lookup table for camera properties in LiveView:
+        "afframeinfo": {    "label": qsTr("Frame Info") },
+        "aspectratio": {    "label": qsTr("Aspect Ratio") },
+        "battempty": {      "label": qsTr("Battery Empty") },
+        "contnotstop": {    "label": qsTr("Continuous") },
+        "drivemode": {      "label": qsTr("Drive Mode") },
+        "expcomp": {        "label": qsTr("Exposure Compensation") },
+        "exposemovie": {    "label": qsTr("Movie Exposure") },
+        "expphotowarning": {"label": qsTr("Exposure Warning") },
+        "focalvalue": {     "label": qsTr("Focal Value") },
+        "focusinfo": {      "label": qsTr("Focus") },
+        "framesize": {      "label": qsTr("Frame Size") },
+        "isospeedvalue": {  "label": qsTr("ISO Speed") },
+        "liveaddinfo": {    "label": qsTr("Additional Info") },
+        "maxmovietime": {   "label": qsTr("Max recording time") },
+        "maxtakenum": {     "label": qsTr("Max. Takes") },
+        "mntmediainfo": {   "label": qsTr("Media Info") },
+        "nrimage": {        "label": qsTr("Image No.") },
+        "recmovietime": {   "label": qsTr("Recorded time") },
+        "rotation": {       "label": qsTr("Rotation") },
+        "shutspeedvalue": { "label": qsTr("Shutter Speed") },
+        "takemode": {       "label": qsTr("Take Mode") },
+        "temperror": {      "label": qsTr("Temporary Error") },
+        "wbvalue": {        "label": qsTr("White Balance") },
+        "zoominfo": {       "label": qsTr("Zoom") },
+    }
+
     NetworkManager {
         id: nwHelper
         readonly property bool online: (!!connectedWifi && connectedWifi.connected)
