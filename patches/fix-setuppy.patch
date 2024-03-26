@@ -1,0 +1,13 @@
+--- a/setup.py	2024-03-23 10:25:08.134917971 +0100
++++ b/setup.py	2024-03-23 10:26:17.745665416 +0100
+@@ -5,8 +5,8 @@
+     with open('README.md', 'rt', encoding='utf-8') as f:
+         return f.read()
+ 
+-setup(name='inattrails',
+-      version='0.9.0',
++setup(name='olympuswifi',
++      version='0.9.1',
+       package_dir={'olympuswifi': 'src/olympuswifi'},
+       packages=['olympuswifi'],
+       author='joergmlpts',

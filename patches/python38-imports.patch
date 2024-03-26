@@ -1,0 +1,38 @@
+diff -Naur a/src/olympuswifi/download.py b/src/olympuswifi/download.py
+--- a/src/olympuswifi/download.py	2023-11-27 16:03:58.000000000 +0100
++++ b/src/olympuswifi/download.py	2024-03-25 09:45:21.407417499 +0100
+@@ -1,5 +1,5 @@
+ import argparse, datetime, os, sys
+-from .camera import OlympusCamera
++from camera import OlympusCamera
+ 
+ 
+ ##############################################################################
+diff -Naur a/src/olympuswifi/liveview.py b/src/olympuswifi/liveview.py
+--- a/src/olympuswifi/liveview.py	2023-11-27 16:03:58.000000000 +0100
++++ b/src/olympuswifi/liveview.py	2024-03-25 09:45:30.688285037 +0100
+@@ -4,7 +4,7 @@
+ 
+ from PIL import Image, ImageTk # on Ubuntu install with "apt install -y python3-pil"
+ 
+-from .camera import OlympusCamera
++from camera import OlympusCamera
+ 
+ 
+ ###########################################################################
+diff -Naur a/src/olympuswifi/main.py b/src/olympuswifi/main.py
+--- a/src/olympuswifi/main.py	2023-11-27 16:03:58.000000000 +0100
++++ b/src/olympuswifi/main.py	2024-03-25 09:45:39.357257178 +0100
+@@ -1,9 +1,9 @@
+ import argparse, sys
+ from typing import Dict, Optional
+ 
+-from .camera import OlympusCamera, RequestError, ResultError
+-from .liveview import LiveViewWindow
+-from .download import download_photos
++from camera import OlympusCamera, RequestError, ResultError
++from liveview import LiveViewWindow
++from download import download_photos
+ 
+ 
+ ######################################################################
