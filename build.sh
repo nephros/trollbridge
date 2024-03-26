@@ -4,6 +4,9 @@ specify -Nns rpm/*yaml || exit 1
 printf linting...
 qmllint qml/*.qml
 python3 -m py_compile python/*.py
+pushd python/olympus-wifi
+[ -e .git ] && git reset --hard
+popd
 printf building...
 rpmbuild -bb --build-in-place rpm/*.spec > build.log 2>&1
 printf "exit: $?\n"
