@@ -80,7 +80,15 @@ Item { id: control
     }
 
     // file handling
-    property FileInfo fi: FileInfo{}
+    //property FileInfo fi: FileInfo{}
+
+    Connections { target: mainWindow
+        onWillQuit: cleanupOnExit()
+    }
+    function cleanupOnExit() {
+        if (live)
+            stopLiveView()
+    }
 
     /*
      * functions from trollbridge.go:

@@ -10,6 +10,9 @@ ApplicationWindow {
     allowedOrientations: Orientation.All
     _defaultPageOrientations: Orientation.All
 
+    signal willQuit()
+    Connections { target: __quickWindow; onClosing: willQuit() }
+
     PyBridge{ id: bridge }
 
     property alias online: nwHelper.online

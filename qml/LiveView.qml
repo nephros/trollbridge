@@ -6,6 +6,11 @@ import Sailfish.Gallery 1.0
 Page {
     id: livePage
 
+    Component.onDestruction: {
+            if (bridge.live) {
+                bridge.stopLiveView()
+            }
+    }
     onStatusChanged: {
         if (status == PageStatus.Deactivating && _navigation == PageNavigation.Back) {
              content.source = ""
@@ -59,6 +64,12 @@ Page {
             onStatusChanged: console.debug(content.status)
             onSourceChanged: console.debug(source)
             onBufferProgressChanged: console.debug(bufferProgress)
+            onErrorChanged: {
+                if (error != MediaPlayer.NoError) {
+                    console.debug("Error:", error, errorString)
+                    bridge.stopLiveView()
+                }
+            }
         }
 
         ButtonLayout { id: buttons
