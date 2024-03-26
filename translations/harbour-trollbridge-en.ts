@@ -120,22 +120,27 @@
 <context>
     <name>LiveView</name>
     <message>
-        <location filename="../qml/LiveView.qml" line="36"/>
+        <location filename="../qml/LiveView.qml" line="48"/>
         <source>Live View</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/LiveView.qml" line="90"/>
+        <location filename="../qml/LiveView.qml" line="67"/>
         <source>Play/Pause</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/LiveView.qml" line="93"/>
+        <location filename="../qml/LiveView.qml" line="70"/>
         <source>Take Picture</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/LiveView.qml" line="100"/>
+        <location filename="../qml/LiveView.qml" line="77"/>
+        <source>Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/LiveView.qml" line="78"/>
         <source>Stop LiveView</source>
         <translation type="unfinished"></translation>
     </message>
@@ -153,57 +158,72 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/Setup.qml" line="37"/>
-        <source>Take Mode</source>
+        <location filename="../qml/Setup.qml" line="28"/>
+        <source>Difference of camera&apos;s time to UTC time.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/Setup.qml" line="38"/>
-        <source>Drive Mode</source>
+        <location filename="../qml/Setup.qml" line="32"/>
+        <source>Set Date/Time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../qml/Setup.qml" line="39"/>
-        <source>Focal Value</source>
+        <location filename="../qml/Setup.qml" line="33"/>
+        <source>Set the camera&apos;s time and date to that of this device.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/Setup.qml" line="40"/>
-        <source>Exposure Compensation</source>
+        <source>Take Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/Setup.qml" line="41"/>
-        <source>Shutter Speed</source>
+        <source>Drive Mode</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/Setup.qml" line="42"/>
-        <source>ISO Speed</source>
+        <source>Focal Value</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/Setup.qml" line="43"/>
-        <source>White Balance</source>
+        <source>Exposure Compensation</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/Setup.qml" line="44"/>
-        <source>Art Filter</source>
+        <source>Shutter Speed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/Setup.qml" line="45"/>
-        <source>Color Tone</source>
+        <source>ISO Speed</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/Setup.qml" line="46"/>
-        <source>Color Phase</source>
+        <source>White Balance</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
         <location filename="../qml/Setup.qml" line="47"/>
+        <source>Art Filter</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="48"/>
+        <source>Color Tone</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="49"/>
+        <source>Color Phase</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/Setup.qml" line="50"/>
         <source>Movie Exposure</source>
         <translation type="unfinished"></translation>
     </message>
@@ -211,7 +231,7 @@
 <context>
     <name>Shutter</name>
     <message>
-        <location filename="../qml/Shutter.qml" line="30"/>
+        <location filename="../qml/Shutter.qml" line="22"/>
         <source>Remote Shutter</source>
         <translation type="unfinished"></translation>
     </message>
@@ -284,6 +304,134 @@
     <message>
         <location filename="../qml/TrollBridge.qml" line="111"/>
         <source>Setup</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>harbour-trollbridge</name>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="48"/>
+        <source>Frame Size</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="38"/>
+        <source>Frame Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="53"/>
+        <source>Media Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="56"/>
+        <source>Rotation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="52"/>
+        <source>Max. Takes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="59"/>
+        <source>Temporary Error</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="40"/>
+        <source>Battery Empty</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="57"/>
+        <source>Shutter Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="46"/>
+        <source>Focal Value</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="43"/>
+        <source>Exposure Compensation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="60"/>
+        <source>White Balance</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="49"/>
+        <source>ISO Speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="41"/>
+        <source>Continuous</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="39"/>
+        <source>Aspect Ratio</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="50"/>
+        <source></source>
+        <translation></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="50"/>
+        <source>Additional Info</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="45"/>
+        <source>Exposure Warning</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="47"/>
+        <source>Focus</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="61"/>
+        <source>Zoom</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="51"/>
+        <source>Max recording time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="42"/>
+        <source>Drive Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="44"/>
+        <source>Movie Exposure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="54"/>
+        <source>Image No.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="55"/>
+        <source>Recorded time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../qml/harbour-trollbridge.qml" line="58"/>
+        <source>Take Mode</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
