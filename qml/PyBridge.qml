@@ -31,6 +31,8 @@ Item { id: control
     //property string liveUrl: "udp://" + liveAddr + ":" + livePort + "/"
     property string liveUrl: "rtp://" + liveAddr + ":" + livePort + "/"
 
+    property int utcdiff
+
     /*
      * helper types and stuff
      */
