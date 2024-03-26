@@ -12,10 +12,6 @@ Page { id: root
         anchors.fill: parent
         contentHeight: view.height
 
-        PageHeader { id: head
-            title: qsTr("Slideshow")
-        }
-
         PullDownMenu {
             enabled: !view.dragging && !view.flicking
             MenuItem { text: qsTr("Select for download");    onClicked: bridge.setSelection(view.currentIndex, true); visible: !view.currentItem.isSelected }
@@ -25,24 +21,16 @@ Page { id: root
         SlideshowView {
             id: view
 
-            function updateHeader() {
-                var o = model.get(currentIndex)
-                head.description = o["file"] + (currentItem.isSelected ? " " + qsTr("(selected)") : "")
-            }
-
-            onCurrentIndexChanged: updateHeader()
-            Component.onCompleted: updateHeader()
-
             //anchors.fill: parent
             anchors.centerIn: parent
-            height: root.height - head.height
+            height: isPortrait ? Screen.height : Screen.width
             itemWidth: width //- Theme.horizontalPageMargin
 
             model: root.model
 
             delegate: ImageViewer {
                 property bool isSelected: selected
-                width: view.itemWidth
+                width:  view.itemWidth
                 height: view.height
                 property string remote: "image://python/" + path + "/" + file
                 property string local: bridge.downloadPath + "/" + bridge.model + "/" + file
