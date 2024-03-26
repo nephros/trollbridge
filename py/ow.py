@@ -9,29 +9,24 @@ from olympuswifi.camera import OlympusCamera, RequestError, ResultError
 from olympuswifi.download import download_photos
 
 def info():
-    print(camera.report_model())
-    print("Camera Info:")
-    print("HEADERS:", camera.HEADERS)
-    print("URL_PREFIX:", camera.URL_PREFIX)
-    print("Versions:", camera.get_versions())
-    print("Supported Modes:", camera.get_supported())
-    #print("Commands:", json.dumps(camera.get_commands(), indent=2, default=lambda o: o.__dict__))
-    print("Known Commands:")
+    # this prints to stdout:  "Connected to..."
+    camera.report_model()
     pprint.pprint(camera.get_commands(), indent=2, depth=1)
-    print("Known properties:")
-    pprint.pprint(camera.get_settable_propnames_and_values(), indent=2, depth=3)
     infodata = {
         'model':      camera.get_camera_info()["model"],
         'headers':    camera.HEADERS,
         'url_prefix': camera.URL_PREFIX,
         'versions':   camera.get_versions(),
         'modes':      list(camera.get_supported()),
-        'commands':   camera.get_commands(),
-        'properties': camera.get_settable_propnames_and_values(),
+        #'commands':   camera.get_commands(),
+        'commands':   list(camera.get_commands().keys()),
+        'propertyInfo': camera.get_settable_propnames_and_values(),
     }
+    print("Connection Mode:", getConnectMode())
     pyotherside.send("camerainfo", json.dumps(infodata, default=parseCmdDescr))
 
-# simple parse helper for OlympusCamera.CmdDescr, just discard the method parameter and return args
+# simple parse helper for OlympusCamera.CmdDescr, just discard the method
+# parameter and return args
 def parseCmdDescr(o):
     if isinstance(o, OlympusCamera.CmdDescr):
         return (o.args)
