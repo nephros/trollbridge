@@ -7,6 +7,7 @@ Name:       harbour-trollbridge
 
 # >> macros
 # << macros
+%define py_setup setup.py
 
 Summary:    TRaveller's OLympus Bridge
 Version:    0.2.0
@@ -19,15 +20,19 @@ Source100:  harbour-trollbridge.yaml
 Source101:  harbour-trollbridge-rpmlintrc
 Requires:   libsailfishapp-launcher
 Requires:   python3-base
-Requires:   python3dist(olympuswifi)
 Requires:   qml(Nemo.DBus)
 Requires:   qml(Nemo.FileManager)
 Requires:   qml(Sailfish.Gallery)
+BuildRequires:  pkgconfig(python3)
+BuildRequires:  pkgconfig
 BuildRequires:  qt5-qttools-linguist
 BuildRequires:  qt5-qmake
 BuildRequires:  sailfish-svg2png
 BuildRequires:  qml-rpm-macros
 BuildRequires:  desktop-file-utils
+BuildRequires:  python3-base
+BuildRequires:  python3-setuptools
+BuildRequires:  python3-rpm-macros
 
 %description
 TRaveller's OLympus Bridge is an app for controlling Olympus OM-D/PEN/Air cameras with integrated WiFi.
@@ -59,6 +64,11 @@ Url:
 
 %build
 # >> build pre
+pushd python/olympus-wifi/
+patch -p1 < ../../patches/ow-fix-setuppy.patch
+patch -p1 < ../../patches/ow-python38-imports.patch
+%{py3_build}
+popd
 # << build pre
 
 %qmake5 
@@ -75,6 +85,11 @@ rm -rf %{buildroot}
 %qmake5_install
 
 # >> install post
+pushd python/olympus-wifi/
+%python3 setup.py  install -O1 --skip-build --install-lib %{buildroot}%{_datadir}/%{name}/python/
+rm -rf %{buildroot}%{_datadir}/%{name}/python/olympuswifi/__pycache__
+rm -rf %{buildroot}%{_datadir}/%{name}/python/*egg-info
+popd
 # << install post
 
 desktop-file-install --delete-original       \
@@ -86,7 +101,8 @@ desktop-file-install --delete-original       \
 %{_datadir}/applications/*.desktop
 %dir %{_datadir}/%{name}
 %{_datadir}/%{name}/qml/*
-%{_datadir}/%{name}/py/*
+%{_datadir}/%{name}/python/*.py
+%{_datadir}/%{name}/python/olympuswifi/
 %{_datadir}/%{name}/translations/%{name}-*.qm
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/hicolor/*/apps/%{name}.svg

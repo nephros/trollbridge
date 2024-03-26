@@ -28,19 +28,27 @@ Description: |
     %endif
 
 BuildArch: noarch
+Macros:
+  - 'py_setup;setup.py'
 Requires:
     - libsailfishapp-launcher
     - python3-base
-    - python3dist(olympuswifi)
+    # python3dist(olympuswifi)
     - qml(Nemo.DBus)
     - qml(Nemo.FileManager)
     - qml(Sailfish.Gallery)
 PkgBR:
+    - pkgconfig
     - qt5-qttools-linguist
     - qt5-qmake
     - sailfish-svg2png
     - qml-rpm-macros
     - desktop-file-utils
+    - python3-base
+    - python3-setuptools
+    - python3-rpm-macros
+PkgConfigBR:
+    - python3
 RpmLintIgnore:
   - 'summary-too-long'
   - 'no-changelogname-tag'
@@ -54,7 +62,8 @@ Files:
   - '%{_datadir}/applications/*.desktop'
   - '%dir %{_datadir}/%{name}'
   - '%{_datadir}/%{name}/qml/*'
-  - '%{_datadir}/%{name}/py/*'
+  - '%{_datadir}/%{name}/python/*.py'
+  - '%{_datadir}/%{name}/python/olympuswifi/'
   - '%{_datadir}/%{name}/translations/%{name}-*.qm'
   - '%{_datadir}/icons/hicolor/*/apps/%{name}.png'
   - '%{_datadir}/icons/hicolor/*/apps/%{name}.svg'

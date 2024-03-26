@@ -69,7 +69,8 @@ Item { id: control
             setHandler('thumbdownloaded', dlDone);
             setHandler('downloaded', dlDone);
             setHandler('camerainfo', updateCameraInfo);
-            addImportPath(Qt.resolvedUrl('../py'));
+            addImportPath(Qt.resolvedUrl('../python'));
+            addImportPath(Qt.resolvedUrl('../python/olympuswifi'));
         }
         // functions
         function connect() {
