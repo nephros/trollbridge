@@ -10,10 +10,7 @@ Item { id: control
     property bool err: false
     property var lastError: ["",]
 
-    Component{ id: cameraInfoTemplate
-        QtObject{}
-    }
-    property QtObject cameraInfo
+    property var cameraInfo: ({})
 
     /*
      * properties from trollbridge.go:
@@ -60,12 +57,8 @@ Item { id: control
             console.debug("Got Camera info", info)
             try {
                 var props = JSON.parse(info)
-                var obj = cameraInfoTemplate.createObject(null, props)
-                if ( obj === null) {
-                    console.warn("Could not create cameraInfo object", e)
-                    return
-                }
-                control.cameraInfo = obj
+                control.cameraInfo = props
+                console.debug("Created cameraInfo object", JSON.stringify(control.cameraInfo,null,2))
             } catch(e) {
                 console.warn("Could not parse cameraInfo", e)
             }
