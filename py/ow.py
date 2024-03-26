@@ -19,7 +19,23 @@ def info():
     print("Known Commands:")
     pprint.pprint(camera.get_commands(), indent=2, depth=1)
     print("Known properties:")
-    pprint.pprint(camera.get_settable_propnames_and_values(), indent=2, depth=1)
+    pprint.pprint(camera.get_settable_propnames_and_values(), indent=2, depth=3)
+    infodata = {
+        'model':      camera.get_camera_info()["model"],
+        'headers':    camera.HEADERS,
+        'url_prefix': camera.URL_PREFIX,
+        'versions':   camera.get_versions(),
+        'modes':      list(camera.get_supported()),
+        'commands':   camera.get_commands(),
+        'properties': camera.get_settable_propnames_and_values(),
+    }
+    pyotherside.send("camerainfo", json.dumps(infodata, default=parseCmdDescr))
+
+# simple parse helper for OlympusCamera.CmdDescr, just discard the method parameter and return args
+def parseCmdDescr(o):
+    if isinstance(o, OlympusCamera.CmdDescr):
+        return (o.args)
+    return super().default(o)
 
 def listImages(path):
     ilist = camera.list_images(path)
@@ -73,6 +89,8 @@ def writeImage (data , path):
 
 camera = OlympusCamera()
 
+
+### QML image provider for Slideshow:
 def image_provider(req_id, req_size):
     data = camera.send_command('get_resizeimg', DIR=req_id, size='1024').content
     return bytearray(data), (1024, 1024), pyotherside.format_data

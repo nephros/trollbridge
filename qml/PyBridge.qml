@@ -10,6 +10,11 @@ Item { id: control
     property bool err: false
     property var lastError: ["",]
 
+    Component{ id: cameraInfoTemplate
+        QtObject{}
+    }
+    property QtObject cameraInfo
+
     /*
      * properties from trollbridge.go:
      */
@@ -50,11 +55,27 @@ Item { id: control
             _list.setProperty(index, "downloaded", true)
             _list.setProperty(index, "quarter", quarter)
         }
+        // whatever information we received, create an object from that:
+        function updateCameraInfo(info) {
+            console.debug("Got Camera info", info)
+            try {
+                var props = JSON.parse(info)
+                var obj = cameraInfoTemplate.createObject(null, props)
+                if ( obj === null) {
+                    console.warn("Could not create cameraInfo object", e)
+                    return
+                }
+                control.cameraInfo = obj
+            } catch(e) {
+                console.warn("Could not parse cameraInfo", e)
+            }
+        }
 
         Component.onCompleted: {
             setHandler('error', error);
             setHandler('thumbdownloaded', dlDone);
             setHandler('downloaded', dlDone);
+            setHandler('camerainfo', updateCameraInfo);
             addImportPath(Qt.resolvedUrl('../py'));
         }
         // functions
@@ -174,11 +195,11 @@ Item { id: control
     //func (ctrl *BridgeControl) Connect() {
     function connect() {
         ow.connect()
-        ow.call('ow.info', [ ], function() {})
         ow.call("ow.getCameraModel", [], function(m) { setModel(m["model"])} )
         ow.call("ow.getFreeSpace", [], function(s) { setSpace(s["unused"]) })
         //ow.call('ow.sendCommand', [ "get_connectmode", {} ], function(t) {setCameraType(t)})
         ow.call("ow.getConnectMode", [], function(t) {setCameraType(t["connectmode"])})
+        ow.call('ow.info', [ ], function() {})
 
         connected = true
     }
