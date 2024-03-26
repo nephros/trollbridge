@@ -40,6 +40,7 @@ Page {
             content.play()
         }
     }
+
     SilicaFlickable {
         anchors.fill: parent
         contentHeight: content.height + Theme.paddingLarge + header.height
@@ -60,20 +61,40 @@ Page {
             onBufferProgressChanged: console.debug(bufferProgress)
         }
 
-        ButtonLayout {
+        ButtonLayout { id: buttons
             anchors.top: content.bottom
             anchors.horizontalCenter: parent.horizontalCenter
             Button { text: qsTr("Play/Pause")
                 onClicked: content.play()
             }
             Button { text: qsTr("Take Picture")
-                onPressedChanged: { 
+                onPressedChanged: {
                     if (!pressed) {
                         bridge.ow.call("ow.camera.take_picture", [], function(res) { setLive(false) })
                     }
                 }
             }
+            Button { text: qsTr("Setup"); onClicked: pageStack.push(setupPage) }
             Button { text: qsTr("Stop LiveView"); onClicked: bridge.stopLiveView() }
+        }
+
+        Page { id: setupPage
+            SilicaListView { id: view
+                anchors.fill: parent
+                onCountChanged: console.debug(count, "controls")
+                model: bridge.liveParms
+                delegate: ComboBox { id: box
+                    width: ListView.view.width
+                    property string propName: modelData
+                    label: propertyMap[propName] ? propertyMap[propName].label : propName
+                    menu: ContextMenu {
+                        Repeater { id: menuRep
+                            model: bridge.cameraInfo["propertyInfo"][box.propName]
+                            delegate: MenuItem { text: modelData }
+                        }
+                    }
+                }
+            }
         }
     }
 }
