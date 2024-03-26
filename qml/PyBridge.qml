@@ -46,6 +46,7 @@ Item { id: control
         // message handlers
         function dlDone(index, quarter){
             console.info("Downloaded", index)
+            _list.setProperty(index, "selected", false)
             _list.setProperty(index, "downloaded", true)
             _list.setProperty(index, "quarter", quarter)
         }
