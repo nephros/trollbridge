@@ -32,6 +32,11 @@ def parseCmdDescr(o):
         return (o.args)
     return super().default(o)
 
+def getOptions(command):
+    list = camera.get_commands()
+    options = list[command].args
+    return json.dumps(options)
+
 def listImages(path):
     ilist = camera.list_images(path)
     return json.dumps(ilist, default=lambda o: o.__dict__)
