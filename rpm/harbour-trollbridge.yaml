@@ -34,6 +34,7 @@ Requires:
     - libsailfishapp-launcher
     - python3-base
     # python3dist(olympuswifi)
+    - python3dist(requests)
     - qml(Nemo.DBus)
     - qml(Nemo.FileManager)
     - qml(Sailfish.Gallery)

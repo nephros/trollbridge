@@ -20,6 +20,7 @@ Source100:  harbour-trollbridge.yaml
 Source101:  harbour-trollbridge-rpmlintrc
 Requires:   libsailfishapp-launcher
 Requires:   python3-base
+Requires:   python3dist(requests)
 Requires:   qml(Nemo.DBus)
 Requires:   qml(Nemo.FileManager)
 Requires:   qml(Sailfish.Gallery)
