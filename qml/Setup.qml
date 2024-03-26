@@ -24,10 +24,13 @@ Page {
             width: parent.width
             PageHeader { title: qsTr("Camera Setup") }
 
-            DetailItem { label: qsTr("UTC Time Difference"); value: bridge.utcdiff }
+            DetailItem { label: qsTr("UTC Time Difference"); value: bridge.utcdiff
+                description: qsTr("Difference of camera's time to UTC time.")
+            }
 
             Button {
-                text: "Set Date/Time"
+                text: qsTr("Set Date/Time")
+                description: qsTr("Set the camera's time and date to that of this device.")
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: bridge.setTime()
             }
