@@ -199,14 +199,14 @@ Item { id: control
         ow.connect()
         ow.call("ow.getCameraModel", [], function(m) { setModel(m["model"])} )
         ow.call("ow.getFreeSpace", [], function(s) { setSpace(s["unused"]) })
-        //ow.call('ow.sendCommand', [ "get_connectmode", {} ], function(t) {setCameraType(t)})
         ow.call("ow.getConnectMode", [], function(t) {setCameraType(t["connectmode"])})
         ow.call('ow.info', [ ], function() {})
 
-        connected = true
+        // don't set, just use bindings on the property
+        //connected = true
     }
 
-    // SetModel BridgeControl Model setter 
+    // SetModel BridgeControl Model setter
     //func (ctrl *BridgeControl) SetModel(model string) {
     function setModel(m) { model = m; console.info("Model:", model) }
     function setSpace(s) { free = s }
@@ -224,9 +224,8 @@ Item { id: control
         ow.call("ow.setClock")
     }
     function startLiveView() {
-        // fixme: don't use fixed quality
+        // FIXME: don't use fixed quality, query available:
         console.debug("Starting LiveView")
-        //ow.call("ow.camera.start_liveview", [ control.livePort , "0800x0600" ], function(res) { setLive(true); console.debug(JSON.stringify(res)) })
         ow.call("ow.camera.start_liveview", [ control.livePort , "0640x0480" ], function(res) { setLive(true, res) })
     }
     function stopLiveView() {
