@@ -86,7 +86,7 @@ rm -rf %{buildroot}
 %qmake5_install
 
 # >> install post
-pushd python/olympus-wifi/
+pushd python/olympuswifi/
 %python3 setup.py  install -O1 --skip-build --install-lib %{buildroot}%{_datadir}/%{name}/python/
 rm -rf %{buildroot}%{_datadir}/%{name}/python/olympuswifi/__pycache__
 rm -rf %{buildroot}%{_datadir}/%{name}/python/*egg-info
