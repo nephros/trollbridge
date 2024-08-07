@@ -40,7 +40,7 @@ Page {
             }
             Label {
                 text: qsTr("Troll Bridge supports both OM-D/PEN WiFi cameras and Olympus Air.<br><br>\
-                The name of the application was chosen in memory of Terry Pratchett, who died on March 12th, 2015.<br>\
+                The name of the application was chosen in memory of Terry Pratchett, who died on March 12th, 2015.<br><br>\
                 The original application has been built using GO language and QML bindings.<br>\
                 Rewritten to replace GO with Python by nephros.\
                 Because of this, the Python version is dedicated to green trolls everywhere.")
@@ -56,71 +56,43 @@ Page {
             SectionHeader {
                 text: qsTr("Copyright")
             }
-            Label {
-                text: "© 2016 Bundyo"
-                x: Theme.paddingLarge
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignLeft
-            }
-            Label {
-                text: "© 2023,2024 nephros"
-                x: Theme.paddingLarge
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignLeft
-            }
-            Label {
-                text: qsTr("Released under the <a href='https://mit-license.org/'>MIT license</a>.")
-                x: Theme.paddingLarge
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignLeft
-                linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
+            Repeater {
+                model: [
+                    "© 2016 Bundyo, <a href='https://github.com/bundyo/trollbridge'>Source Code</a>",
+                    "© 2023,2024 nephros, <a href='https://github.com/nephros/trollbridge'>Source Code</a>",
+                    qsTr("Released under the <a href='https://mit-license.org/'>MIT license</a>."),
+                ]
+                delegate: Label {
+                    text: modelData
+                    x: Theme.paddingLarge
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignLeft
+                    linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
+                }
             }
 
             SectionHeader {
                 text: qsTr("Additional Copyright")
             }
+            Repeater {
+                model: [
+                       qsTr("<a href='https://github.com/joergmlpts/olympus-wifi/'>olympus-wifi Python module</a> © joergmlpts."),
+                       qsTr("<a href='https://together.jolla.com/question/105098/how-to-setup-go-142-15-16-runtime-and-go-qml-pkg-for-mersdk/'>GO-QML port to Sailfish OS</a> © Nekron."),
+                       qsTr("<a href='https://github.com/go-qml/qml'>GO-QML package</a> © Gustavo Niemeyer."),
+                       qsTr("<a href='https://golang.org/'>GO</a> Copyright © 2012 The Go Authors. All rights reserved.")
+                ]
 
-            Label {
-                text: qsTr("<a href='https://github.com/joergmlpts/olympus-wifi/'>olympus-wifi Python module</a> © joergmlpts.")
-                anchors.horizontalCenter: parent.horizontalCenter
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignLeft
-                linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
-                x: Theme.paddingLarge
+                delegate: Label {
+                    x: Theme.paddingLarge
+                    width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignLeft
+                    text: modelData
+                    linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
+                }
             }
-            Label {
-                text: qsTr("<a href='https://together.jolla.com/question/105098/how-to-setup-go-142-15-16-runtime-and-go-qml-pkg-for-mersdk/'>GO-QML port to Sailfish OS</a> © Nekron.")
-                anchors.horizontalCenter: parent.horizontalCenter
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignLeft
-                linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
-                x: Theme.paddingLarge
-            }
-            Label {
-                text: qsTr("<a href='https://github.com/go-qml/qml'>GO-QML package</a> © Gustavo Niemeyer.")
-                anchors.horizontalCenter: parent.horizontalCenter
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignLeft
-                linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
-                x: Theme.paddingLarge
-            }
-            Label {
-                text: qsTr("<a href='https://golang.org/'>GO</a> Copyright © 2012 The Go Authors. All rights reserved.")
-                anchors.horizontalCenter: parent.horizontalCenter
-                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
-                width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
-                verticalAlignment: Text.AlignVCenter
-                horizontalAlignment: Text.AlignLeft
-                linkColor: (Theme.colorScheme === Theme.LightOnDark) ?  olygray : olyblue
-                x: Theme.paddingLarge
-            }
-
             Label {
                 text: qsTr("OLYMPUS, Olympus PEN, and Olympus Air are registered trademarks of %1.<br>\
                 All other trademarks are property of their respective owners.").arg("OLYMPUS Corporation")
