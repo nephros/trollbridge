@@ -54,17 +54,20 @@ Page {
                 font.pixelSize: Theme.fontSizeLarge
                 font.family: Theme.fontFamilyHeading
             }
-            Loader {
+            Image {
                 anchors.horizontalCenter: parent.horizontalCenter
-                active: !!bridge.model
-                sourceComponent: Image {
-                    height: Theme.iconSizeLarge
-                    sourceSize.height: height
-                    fillMode: Image.PreserveAspectFit
-                    source: {
-                        if (/^E-M/.test(bridge.model)) return "devices/olympus-om-d.png"
-                        return ""
-                    }
+                height: Theme.iconSizeLarge
+                sourceSize.height: height
+                fillMode: Image.PreserveAspectFit
+                asynchronous: true
+                source: {
+                    if (!online) return "" //"image://theme/icon-m-wlan-no-signal"
+                    if (/^E-M/.test(bridge.model))  return "devices/olympus-om-d.png"
+                    if (/^AIR-/.test(bridge.model)) return "devices/olympus-air.png"
+                    if (/PEN/.test(bridge.model))   return "devices/olympus-pen.png"
+                    if (/^E-P/.test(bridge.model))  return "devices/olympus-pen.png"
+                    if (/^TG/.test(bridge.model))   return "devices/olympus-tg.png"
+                    return "image://theme/icon-m-camera"
                 }
             }
             Label {
@@ -88,7 +91,8 @@ Page {
             SecondaryButton {
                 text: qsTr("Shutter")
                 icon.source: "image://theme/icon-cover-camera"
-                visible: bridge.connected && !bridge.opc
+                visible: bridge.connected
+                enabled: !bridge.opc
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked: {
                     bridge.switchMode("shutter")
