@@ -65,7 +65,7 @@ Url:
 
 %build
 # >> build pre
-pushd python/olympus-wifi/
+pushd python/olympuswifi/
 patch -p1 < ../../patches/ow-fix-setuppy.patch
 patch -p1 < ../../patches/ow-python38-imports.patch
 %{py3_build}

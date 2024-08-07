@@ -1,3 +1,3 @@
 [submodule "python/olympus-wifi"]
-	path = python/olympus-wifi
+	path = python/olympuswifi
 	url = https://github.com/joergmlpts/olympus-wifi/
