@@ -20,6 +20,7 @@ Source100:  harbour-trollbridge.yaml
 Source101:  harbour-trollbridge-rpmlintrc
 Requires:   libsailfishapp-launcher
 Requires:   python3-base
+Requires:   python3dist(pillow)
 Requires:   python3dist(requests)
 Requires:   qml(Nemo.DBus)
 Requires:   qml(Nemo.FileManager)
@@ -31,7 +32,6 @@ BuildRequires:  qt5-qmake
 BuildRequires:  sailfish-svg2png
 BuildRequires:  qml-rpm-macros
 BuildRequires:  desktop-file-utils
-BuildRequires:  python3-base
 BuildRequires:  python3-setuptools
 BuildRequires:  python3-rpm-macros
 
@@ -86,11 +86,17 @@ rm -rf %{buildroot}
 %qmake5_install
 
 # >> install post
+
+# install submodule python lib:
 pushd python/olympuswifi/
 %python3 setup.py  install -O1 --skip-build --install-lib %{buildroot}%{_datadir}/%{name}/python/
-rm -rf %{buildroot}%{_datadir}/%{name}/python/olympuswifi/__pycache__
+# I guess as an install we own we want the cache packaged?
+#rm -rf %%{buildroot}%%{_datadir}/%%{name}/python/olympuswifi/__pycache__
 rm -rf %{buildroot}%{_datadir}/%{name}/python/*egg-info
 popd
+
+# compile our own script
+%python3 -m py_compile %{buildroot}%{_datadir}/%{name}/python/*.py
 # << install post
 
 desktop-file-install --delete-original       \
@@ -101,10 +107,10 @@ desktop-file-install --delete-original       \
 %defattr(-,root,root,-)
 %{_datadir}/applications/*.desktop
 %dir %{_datadir}/%{name}
-%{_datadir}/%{name}/qml/*
-%{_datadir}/%{name}/python/*.py
-%{_datadir}/%{name}/python/olympuswifi/
-%{_datadir}/%{name}/translations/%{name}-*.qm
+%{_datadir}/%{name}/qml/
+%pycached %{_datadir}/%{name}/python/*.py
+%pycached %{_datadir}/%{name}/python/olympuswifi/*.py
+%{_datadir}/%{name}/translations/
 %{_datadir}/icons/hicolor/*/apps/%{name}.png
 %{_datadir}/icons/hicolor/*/apps/%{name}.svg
 # >> files
