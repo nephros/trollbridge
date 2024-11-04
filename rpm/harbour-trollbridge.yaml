@@ -39,6 +39,7 @@ Requires:
     - qml(Nemo.DBus)
     - qml(Nemo.FileManager)
     - qml(Sailfish.Gallery)
+    - qml(Sailfish.WebView)
 PkgBR:
     - pkgconfig
     - qt5-qttools-linguist

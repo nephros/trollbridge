@@ -16,6 +16,10 @@ Page {
                 text: qsTr("Connect to Wi-Fi...")
                 onClicked: wifi.connect()
             }
+            MenuItem {
+                text: qsTr("Open Webview")
+                onClicked: pageStack.push(Qt.resolvedUrl("wv/WVPage.qml"))
+            }
             busy: bridge.connected ? false : (!mainWindow.connected)
         }
 

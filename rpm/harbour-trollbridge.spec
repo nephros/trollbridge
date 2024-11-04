@@ -25,6 +25,7 @@ Requires:   python3dist(requests)
 Requires:   qml(Nemo.DBus)
 Requires:   qml(Nemo.FileManager)
 Requires:   qml(Sailfish.Gallery)
+Requires:   qml(Sailfish.WebView)
 BuildRequires:  pkgconfig(python3)
 BuildRequires:  pkgconfig
 BuildRequires:  qt5-qttools-linguist
